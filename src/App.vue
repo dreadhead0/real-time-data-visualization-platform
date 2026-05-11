@@ -2,6 +2,7 @@
 import { RouterView } from "vue-router";
 import { onBeforeUnmount, onMounted, watch } from "vue";
 import { usePreferencesStore } from "@/stores/preferences";
+import ToastHost from "@/components/ui/ToastHost.vue";
 
 const preferences = usePreferencesStore();
 
@@ -36,4 +37,5 @@ onBeforeUnmount(() => {
 
 <template>
   <RouterView />
+  <ToastHost />
 </template>

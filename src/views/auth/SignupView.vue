@@ -4,7 +4,9 @@ import { Activity, Eye, EyeOff } from "lucide-vue-next";
 import { computed, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { usePreferencesStore } from "@/stores/preferences";
+import { useToastStore } from "@/stores/toast";
 
+const toast = useToastStore();
 const router = useRouter();
 const auth = useAuthStore();
 const preferences = usePreferencesStore();
@@ -20,14 +22,21 @@ const passwordInputType = computed(() => {
 });
 
 function submitSignup() {
-  const safeName = name.value.trim() || "Operations Analyst";
-  const safeEmail = email.value.trim() || "analyst@pulseops.local";
+  const result = auth.signup(name.value, email.value, password.value);
 
-  auth.signup(safeName, safeEmail);
+  if (!result.ok) {
+    toast.error(result.message);
+    return;
+  }
+
+  const safeName = name.value.trim() || "Operations Analyst";
+  const safeEmail =
+    email.value.trim().toLowerCase() || "analyst@pulseops.local";
 
   preferences.setDisplayName(safeName);
   preferences.setEmail(safeEmail);
 
+  toast.success("Account created. Welcome to PulseOps.");
   router.push("/app");
 }
 </script>

@@ -4,10 +4,12 @@ import { Activity, Eye, EyeOff } from "lucide-vue-next";
 import { computed, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { usePreferencesStore } from "@/stores/preferences";
+import { useToastStore } from "@/stores/toast";
 
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
+const toast = useToastStore();
 const preferences = usePreferencesStore();
 
 const email = ref(preferences.email || "");
@@ -20,10 +22,19 @@ const passwordInputType = computed(() => {
 });
 
 function submitLogin() {
-  const safeEmail = email.value.trim() || "analyst@pulseops.local";
+  const result = auth.login(email.value, password.value);
 
-  auth.login(safeEmail, preferences.displayName);
-  preferences.setEmail(safeEmail);
+  if (!result.ok) {
+    toast.error(result.message);
+    return;
+  }
+
+  if (result.user) {
+    preferences.setDisplayName(result.user.name);
+    preferences.setEmail(result.user.email);
+  }
+
+  toast.success("Welcome back to PulseOps.");
 
   const redirect =
     typeof route.query.redirect === "string" ? route.query.redirect : "/app";
