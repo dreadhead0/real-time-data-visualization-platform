@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@400;500;600;700;800&display=swap');
 
-/* ─── DESIGN TOKENS ───────────────────────────────────────── */
 :root {
   --bg-base:        #050810;
   --bg-surface:     #090d1a;
@@ -407,6 +406,112 @@ a {
   margin-top: 0.3rem;
   color: var(--muted);
   font-size: 0.82rem;
+}
+
+/* Landing page polish */
+.landing-page {
+  min-height: 100vh;
+  padding: 1rem;
+  overflow-x: hidden;
+}
+
+.landing-nav {
+  max-width: 1180px;
+  min-height: 4.5rem;
+}
+
+.hero {
+  max-width: 1180px;
+  min-height: calc(100vh - 8rem);
+  margin: 0 auto;
+  padding: 4rem 0 3rem;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 0.9fr);
+  gap: clamp(2.5rem, 6vw, 6rem);
+}
+
+.hero__content {
+  min-width: 0;
+}
+
+.hero__content h1 {
+  max-width: 680px;
+  margin: 0.9rem 0 1.1rem;
+  font-size: clamp(3.1rem, 6.2vw, 5.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.075em;
+  text-wrap: balance;
+}
+
+.hero__content p:not(.eyebrow) {
+  max-width: 590px;
+  margin-bottom: 1.35rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.hero__actions {
+  align-items: center;
+}
+
+.hero-card {
+  align-self: center;
+}
+
+.metric-preview {
+  min-height: 230px;
+}
+
+@media (max-width: 1080px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 3rem;
+  }
+
+  .hero__content h1 {
+    max-width: 780px;
+    font-size: clamp(3rem, 8vw, 5rem);
+  }
+
+  .hero__content p:not(.eyebrow) {
+    max-width: 720px;
+  }
+
+  .hero-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-page {
+    padding: 0.75rem;
+  }
+
+  .hero {
+    padding: 2.5rem 0;
+    gap: 2rem;
+  }
+
+  .hero__content h1 {
+    max-width: 100%;
+    font-size: clamp(2.4rem, 14vw, 3.7rem);
+    line-height: 1.03;
+    letter-spacing: -0.06em;
+  }
+
+  .hero__content p:not(.eyebrow) {
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .hero__actions {
+    align-items: stretch;
+  }
+
+  .hero__actions .primary-button,
+  .hero__actions .secondary-button {
+    width: 100%;
+  }
 }
 
 .auth-page {

@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  onMounted,
+  onUnmounted,
+  ref,
+} from "vue";
 import {
   AlertTriangle,
   CircleGauge,
@@ -23,11 +29,21 @@ import { useAnalyticsStore } from "@/stores/analytics";
 import { useStreamConnection } from "@/composables/useStreamConnection";
 import { useAnalyticsStream } from "@/composables/useAnalyticsStream";
 
-import HeatmapChart from "@/components/charts/HeatmapChart.vue";
-import CandlestickChart from "@/components/charts/CandlestickChart.vue";
-import RadarHealthChart from "@/components/charts/RadarHealthChart.vue";
-import NetworkGraphChart from "@/components/charts/NetworkGraphChart.vue";
-import GeoTrafficMap from "@/components/charts/GeoTrafficMap.vue";
+const HeatmapChart = defineAsyncComponent(
+  () => import("@/components/charts/HeatmapChart.vue"),
+);
+const CandlestickChart = defineAsyncComponent(
+  () => import("@/components/charts/CandlestickChart.vue"),
+);
+const RadarHealthChart = defineAsyncComponent(
+  () => import("@/components/charts/RadarHealthChart.vue"),
+);
+const NetworkGraphChart = defineAsyncComponent(
+  () => import("@/components/charts/NetworkGraphChart.vue"),
+);
+const GeoTrafficMap = defineAsyncComponent(
+  () => import("@/components/charts/GeoTrafficMap.vue"),
+);
 
 import AdvancedDashboardControls from "@/components/controls/AdvancedDashboardControls.vue";
 import SecurityEventsTable from "@/components/tables/SecurityEventsTable.vue";

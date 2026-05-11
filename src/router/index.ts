@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import LandingView from '@/views/LandingView.vue'
-import LoginView from '@/views/auth/LoginView.vue'
-import SignupView from '@/views/auth/SignupView.vue'
-import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import DashboardView from '@/views/DashboardView.vue'
-import SettingsView from '@/views/SettingsView.vue'
+const LandingView = () => import('@/views/LandingView.vue')
+const LoginView = () => import('@/views/auth/LoginView.vue')
+const SignupView = () => import('@/views/auth/SignupView.vue')
+const DashboardLayout = () => import('@/layouts/DashboardLayout.vue')
+const DashboardView = () => import('@/views/DashboardView.vue')
+const SettingsView = () => import('@/views/SettingsView.vue')
 
 const router = createRouter({
   history: createWebHistory(),

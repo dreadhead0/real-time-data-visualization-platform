@@ -1,95 +1,115 @@
-# Observatory — Real-time Analytics Dashboard
+# PulseOps Analytics
 
-A high-performance, real-time analytics dashboard built with Vue 3, TypeScript, Pinia, and ECharts. Simulates a production-grade DevOps/infrastructure monitoring platform with live-streaming telemetry, smooth chart updates, and interactive controls.
+A high-performance real-time data visualization platform built with Vue 3, TypeScript, Pinia, Vue Router, and ECharts.
+
+## Features
+
+- Real-time streaming dashboard
+- CPU, memory, latency, throughput, error-rate, and network metrics
+- Live metric cards with animated counters
+- Line, area, and bar charts
+- Advanced ECharts visualizations:
+  - heatmap
+  - candlestick chart
+  - radar chart
+  - service network graph
+  - geographic traffic visualization
+- Live process monitor
+- Live activity feed
+- Security event inspector
+- System log explorer
+- Dataset toggles
+- Dashboard mode switching
+- Severity filtering
+- Searchable logs and events
+- Pause/resume streaming
+- Time range controls
+- Landing, login, signup, dashboard, and settings pages
+- Dark/light/system theme support
+- Persisted profile settings
+- Profile picture upload
+- Responsive desktop/tablet/mobile layout
 
 ## Setup
 
 ```bash
 npm install
-npm run dev        # development server at http://localhost:5173
-npm run build      # production build
-npm run type-check # TypeScript validation
-```
+npm run dev
 
-## Architecture
+Production build:
 
-```
+npm run build
+npm run preview
+Architecture
+
+The app is organized around reusable Vue components and centralized Pinia stores.
+
 src/
-├── lib/
-│   ├── StreamManager.ts     # WebSocket/mock connection singleton
-│   ├── MockGenerator.ts     # Realistic metric simulation
-│   ├── Validator.ts         # Zod-based payload validation + sanitization
-│   ├── Throttler.ts         # Debounce + batch utility
-│   └── CircularBuffer.ts    # Fixed-capacity ring buffer
-├── stores/
-│   ├── metrics.ts           # Metric time-series (Pinia)
-│   ├── alerts.ts            # Alert events + filtering (Pinia)
-│   └── stream.ts            # Stream status + controls (Pinia)
-├── components/
-│   ├── charts/
-│   │   ├── LineAreaChart.vue  # Streaming line/area chart (ECharts)
-│   │   └── BarChart.vue       # Multi-metric bar comparison
-│   ├── feed/
-│   │   └── ActivityFeed.vue   # Virtualised live event feed
-│   ├── controls/
-│   │   └── DashboardControls.vue  # Pause, time range, reset
-│   └── ui/
-│       ├── MetricCard.vue     # Animated KPI card
-│       ├── ThemeToggle.vue    # Dark/light mode
-│       └── ErrorBoundary.vue  # onErrorCaptured wrapper
-├── composables/
-│   ├── useStreamConnection.ts  # Wires StreamManager → stores
-│   ├── useChartResize.ts       # ResizeObserver for ECharts
-│   └── useAnimatedCounter.ts   # RAF-based number animation
-├── types/
-│   └── domain.ts              # MetricPoint, AlertEvent, etc.
-└── views/
-    └── DashboardView.vue      # Top-level layout
+  components/
+    charts/       Reusable ECharts visualizations
+    controls/     Dashboard controls and filters
+    feed/         Activity feed
+    tables/       Process, security, and logs tables
+    ui/           Metric cards and error boundaries
+  composables/    Streaming and chart lifecycle logic
+  layouts/        Dashboard shell
+  lib/            Mock generators and resilience helpers
+  router/         Vue Router setup
+  stores/         Pinia stores
+  types/          Shared TypeScript models
+  views/          Route-level pages
+
+  State management strategy
+
+The platform uses Pinia stores for clean, scalable state management:
+
+metrics manages infrastructure metrics and chart series.
+stream manages pause/resume streaming state.
+alerts manages alert and activity feed state.
+analytics manages security, geography, market, network graph, heatmap, radar, and log datasets.
+preferences persists theme, profile, role, email, and avatar preferences.
+
+Persisted state is used only for user preferences and dashboard configuration, not high-frequency streaming arrays.
+
+Data streaming approach
+
+The dashboard uses simulated real-time data generators to model a production streaming environment. Multiple intervals produce different data frequencies:
+
+fast stream for logs, markets, and geo traffic
+medium stream for heatmap and security events
+slow stream for service graph and radar health profile
+
+Streams are cleaned up on component unmount to prevent memory leaks.
+
+Rendering optimization decisions
+Route-level lazy loading reduces initial page load.
+Advanced chart components are async-loaded.
+Streaming arrays are capped to prevent unbounded memory growth.
+Chart instances are disposed on unmount.
+Resize observers are disconnected on unmount.
+ECharts canvas renderer is used for efficient chart rendering.
+Dashboard filters use computed values instead of mutating source datasets.
+Large datasets are sliced before display.
+Error handling and resilience
+Components are wrapped with error boundaries.
+Mock data is validated and shaped before entering stores.
+Streaming data arrays use bounded buffers.
+Resilience utilities provide:
+safe JSON parsing
+text sanitization
+exponential reconnect backoff helpers
+Empty states are displayed for filtered security and log views.
+The UI does not rely on unsafe DOM injection.
+
+Security and stability
+User profile values are rendered through Vue bindings.
+Uploaded avatars are limited to image files below 1.5MB.
+No raw HTML rendering is used for user profile fields.
+Intervals and observers are cleaned up.
+Dataset filters do not mutate raw source data.
+Trade-offs
+Streaming is mocked instead of using a live WebSocket backend because the task allows simulated streams.
+Geographic visualization uses longitude/latitude plotting instead of a full world map asset to keep the bundle lighter.
+Authentication pages are UI-only placeholders for the frontend stage.
+Market data is simulated to avoid external API rate limits and secret management.
 ```
-
-## State Management Strategy
-
-**Pinia** with three independent stores, chosen over Vuex for first-class TypeScript support and composable store design:
-
-- `useMetricsStore` — one `CircularBuffer<MetricPoint>` per metric (1 000-point cap). Exposes `getSeriesData(metric)` which returns a windowed slice based on the current time range. Computed `summary` provides the latest value per metric for the KPI cards.
-- `useAlertsStore` — prepends incoming alerts, caps at 500. Computed `filtered` applies search + severity filter reactively. Counts by severity are also computed.
-- `useStreamStore` — tracks connection status, pause state, message count, and last heartbeat. Controls pause/resume without touching the other stores.
-
-## Rendering Optimization Decisions
-
-**ECharts `setOption({ series: [{ data }] }, { notMerge: false })`**
-Incremental updates — ECharts diffs the new data against the canvas and repaints only changed regions. This is the single biggest performance win; it avoids tearing down and re-drawing the entire series on every tick.
-
-**Circular buffer**
-`CircularBuffer<T>` is a custom fixed-capacity ring buffer. Pushing to a full buffer evicts the oldest item with `O(1)` cost, avoiding the `O(n)` cost of `Array.prototype.shift()`. The buffer itself is not reactive — only the computed `summary` (latest values) and the chart data slices (read on timer) are reactive.
-
-**Throttler + batching**
-Raw incoming events are queued in `Throttler` and flushed to the store every 100 ms in a batch. This prevents a cascade of reactive updates on every WebSocket message and keeps Vue's scheduler from being overwhelmed under high-frequency streams.
-
-**`large: true` + `largeThreshold: 200` on ECharts series**
-ECharts switches to WebGL-accelerated rendering automatically above 200 points, keeping frame rate smooth as series grow.
-
-**Memoized chart data**
-`getSeriesData(metric)` is called inside a Vue `computed()` in the parent view, so ECharts only receives a new array reference when the store actually changes.
-
-## Data Streaming Approach
-
-`StreamManager` is a plain TypeScript class (not a composable) because it has a singleton lifecycle that outlives any component. It supports two modes:
-
-- **`'mock'`** (default) — `MockGenerator` drives `setInterval` at 200 ms, cycling through all six metrics with a random-walk model that produces realistic variance and occasional threshold breaches. A separate 5-second interval emits heartbeats.
-- **`'websocket'`** — connects to a WebSocket URL, parses JSON, validates through `Validator.ts`, and emits typed `StreamPayload` events. Falls back with exponential backoff (1 s → 30 s cap).
-
-The `useStreamConnection` composable registers payload and status handlers on `StreamManager` in `onMounted` and unregisters + destroys throttlers in `onUnmounted`, preventing memory leaks.
-
-All incoming payloads pass through `validatePayload()` (Zod schema) before touching any store. Invalid payloads are logged and dropped silently, so malformed data can never crash the UI.
-
-## Trade-offs
-
-| Decision | Chosen | Alternative considered | Reason |
-|---|---|---|---|
-| Chart library | ECharts | D3.js, Recharts | ECharts has the best incremental streaming API and WebGL fallback for large datasets |
-| State library | Pinia | Zustand, Redux Toolkit | First-class Vue 3 + TypeScript integration; stores match domain boundaries naturally |
-| Mock transport | `setInterval` | WebSocket echo server | Zero infrastructure for the demo; easy to swap — change `StreamManager` mode to `'websocket'` |
-| Buffer strategy | Custom ring buffer | Plain reactive array | Avoids O(n) shift cost and prevents Vue from tracking every array element |
-| Chart renderer | Canvas | SVG | Canvas scales to 1 000+ points without DOM node cost |
-| Error handling | `onErrorCaptured` boundary | Global `window.onerror` | Scoped to dashboard sections; one bad chart won't kill the feed or cards |
