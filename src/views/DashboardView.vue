@@ -18,6 +18,7 @@ import {
   Network,
   RadioTower,
   ShieldAlert,
+  SlidersHorizontal,
   TrendingUp,
   XCircle,
   Zap,
@@ -63,6 +64,8 @@ useAnalyticsStream();
 const metrics = useMetricsStore();
 const alerts = useAlertsStore();
 const analytics = useAnalyticsStore();
+
+const controlsOpen = ref(true);
 
 const cpuSeries = computed(() => metrics.getSeriesData("cpu"));
 const memorySeries = computed(() => metrics.getSeriesData("memory"));
@@ -305,7 +308,24 @@ const healthCards = computed(() => [
     </Transition>
 
     <main class="dashboard-body">
-      <AdvancedDashboardControls />
+      <div class="controls-collapse-shell">
+        <button
+          class="controls-toggle"
+          type="button"
+          @click="controlsOpen = !controlsOpen"
+        >
+          <span>
+            <SlidersHorizontal :size="16" />
+            {{ controlsOpen ? "Hide controls" : "Show controls" }}
+          </span>
+
+          <small> {{ analytics.chartMode }} mode </small>
+        </button>
+
+        <Transition name="controls-collapse">
+          <AdvancedDashboardControls v-if="controlsOpen" />
+        </Transition>
+      </div>
 
       <section class="health-strip">
         <article
@@ -1090,6 +1110,74 @@ const healthCards = computed(() => [
   .chart-card {
     min-height: 250px;
     border-radius: 1rem;
+  }
+}
+
+.controls-collapse-shell {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.controls-toggle {
+  width: fit-content;
+  min-height: 2.45rem;
+  padding: 0 0.85rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  background: rgba(56, 189, 248, 0.075);
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.controls-toggle span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.controls-toggle small {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.controls-toggle:hover {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.controls-collapse-enter-active,
+.controls-collapse-leave-active {
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    max-height 220ms ease;
+  overflow: hidden;
+}
+
+.controls-collapse-enter-from,
+.controls-collapse-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+  max-height: 0;
+}
+
+.controls-collapse-enter-to,
+.controls-collapse-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 700px;
+}
+
+@media (max-width: 640px) {
+  .controls-toggle {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 </style>

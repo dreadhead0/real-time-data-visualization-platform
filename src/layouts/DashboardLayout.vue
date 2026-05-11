@@ -145,10 +145,21 @@ function goToDashboardMode(mode: AdvancedChartMode) {
         </div>
 
         <div class="topbar__actions">
-          <button class="theme-toggle" type="button" @click="toggleTheme">
+          <button
+            class="theme-toggle"
+            type="button"
+            :aria-label="
+              preferences.effectiveTheme === 'dark'
+                ? 'Switch to light mode'
+                : 'Switch to dark mode'
+            "
+            @click="toggleTheme"
+          >
             <Sun v-if="preferences.effectiveTheme === 'dark'" :size="17" />
             <Moon v-else :size="17" />
-            {{ preferences.effectiveTheme === "dark" ? "Light" : "Dark" }}
+            <span class="theme-toggle__text">
+              {{ preferences.effectiveTheme === "dark" ? "Light" : "Dark" }}
+            </span>
           </button>
 
           <div class="topbar__status">
