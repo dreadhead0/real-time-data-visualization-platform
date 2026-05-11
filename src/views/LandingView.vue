@@ -34,7 +34,7 @@ import { Activity, BarChart3, Globe2, ShieldCheck, Zap } from "lucide-vue-next";
         </p>
 
         <div class="hero__actions">
-          <RouterLink to="/app" class="primary-button">
+          <RouterLink to="/login?redirect=/app" class="primary-button">
             Launch Dashboard
           </RouterLink>
           <RouterLink to="/login" class="secondary-button">

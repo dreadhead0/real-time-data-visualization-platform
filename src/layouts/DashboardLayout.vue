@@ -15,6 +15,7 @@ import {
 import { computed, ref } from "vue";
 import { usePreferencesStore } from "@/stores/preferences";
 import { useAnalyticsStore } from "@/stores/analytics";
+import { useAuthStore } from "@/stores/auth";
 import type { AdvancedChartMode } from "@/types/analytics";
 
 const sidebarOpen = ref(false);
@@ -22,6 +23,8 @@ const sidebarOpen = ref(false);
 const router = useRouter();
 const preferences = usePreferencesStore();
 const analytics = useAnalyticsStore();
+
+const auth = useAuthStore();
 
 const initials = computed(() => {
   return preferences.displayName
@@ -36,6 +39,12 @@ function toggleTheme() {
   preferences.setTheme(
     preferences.effectiveTheme === "dark" ? "light" : "dark",
   );
+}
+
+function logout() {
+  auth.logout();
+  sidebarOpen.value = false;
+  router.push("/");
 }
 
 function goToDashboardMode(mode: AdvancedChartMode) {
@@ -117,10 +126,10 @@ function goToDashboardMode(mode: AdvancedChartMode) {
         </RouterLink>
       </nav>
 
-      <RouterLink to="/" class="sidebar__logout">
+      <button class="sidebar__logout" type="button" @click="logout">
         <LogOut :size="18" />
-        Exit
-      </RouterLink>
+        Logout
+      </button>
     </aside>
 
     <div

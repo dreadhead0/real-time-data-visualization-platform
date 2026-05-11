@@ -1747,3 +1747,108 @@ body,
     line-height: 1.02;
   }
 }
+
+.sidebar__logout {
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.auth-hint {
+  margin: 0.85rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.password-field {
+  width: 100%;
+  height: 2.9rem;
+  padding: 0 0.75rem 0 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--panel-border);
+  background: #0b1120;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.password-field:focus-within {
+  border-color: rgba(56, 189, 248, 0.7);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+}
+
+.password-field input {
+  min-width: 0;
+  width: 100%;
+  height: auto;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+.password-toggle {
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  border: 0;
+  border-radius: 0.65rem;
+  background: transparent;
+  color: var(--text-secondary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: var(--neon-blue);
+  background: rgba(56, 189, 248, 0.09);
+}
+
+html[data-theme='light'] .password-field {
+  background: rgba(248, 250, 252, 0.95);
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--text-primary) !important;
+  caret-color: var(--text-primary);
+  box-shadow: 0 0 0 1000px #0b1120 inset !important;
+  -webkit-box-shadow: 0 0 0 1000px #0b1120 inset !important;
+  border-color: var(--panel-border);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+html[data-theme='light'] input:-webkit-autofill,
+html[data-theme='light'] input:-webkit-autofill:hover,
+html[data-theme='light'] input:-webkit-autofill:focus,
+html[data-theme='light'] input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--text-primary) !important;
+  caret-color: var(--text-primary);
+  box-shadow: 0 0 0 1000px rgba(248, 250, 252, 0.95) inset !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(248, 250, 252, 0.95) inset !important;
+}
+
+.auth-form .password-field input {
+  height: auto;
+  padding: 0;
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: 0;
+}
+
+.auth-form .password-field input:focus {
+  border: 0 !important;
+  box-shadow: none !important;
+}
