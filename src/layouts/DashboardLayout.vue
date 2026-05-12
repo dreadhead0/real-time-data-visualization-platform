@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
+import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
+import {
   Activity,
   BarChart3,
   Cpu,
@@ -23,10 +24,9 @@ const router = useRouter();
 const route = useRoute();
 const preferences = usePreferencesStore();
 const analytics = useAnalyticsStore();
-
 const auth = useAuthStore();
 
-const isDashboardRoute = computed(() => route.name === 'dashboard')
+const isDashboardRoute = computed(() => route.name === "dashboard");
 
 const initials = computed(() => {
   return preferences.displayName
@@ -91,6 +91,7 @@ function goToDashboardMode(mode: AdvancedChartMode) {
           :class="{
             active: isDashboardRoute && analytics.chartMode === 'overview',
           }"
+          @click="goToDashboardMode('overview')"
         >
           <BarChart3 :size="18" />
           Dashboard
@@ -101,6 +102,7 @@ function goToDashboardMode(mode: AdvancedChartMode) {
           :class="{
             active: isDashboardRoute && analytics.chartMode === 'network',
           }"
+          @click="goToDashboardMode('network')"
         >
           <Cpu :size="18" />
           Infrastructure
@@ -111,6 +113,7 @@ function goToDashboardMode(mode: AdvancedChartMode) {
           :class="{
             active: isDashboardRoute && analytics.chartMode === 'security',
           }"
+          @click="goToDashboardMode('security')"
         >
           <Shield :size="18" />
           Security
@@ -121,6 +124,7 @@ function goToDashboardMode(mode: AdvancedChartMode) {
           :class="{
             active: isDashboardRoute && analytics.chartMode === 'geography',
           }"
+          @click="goToDashboardMode('geography')"
         >
           <Globe2 :size="18" />
           Geography

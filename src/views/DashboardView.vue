@@ -65,6 +65,12 @@ const metrics = useMetricsStore();
 const alerts = useAlertsStore();
 const analytics = useAnalyticsStore();
 
+const isInfrastructureMode = computed(() => {
+  return (
+    analytics.chartMode === "overview" || analytics.chartMode === "network"
+  );
+});
+
 const cpuSeries = computed(() => metrics.getSeriesData("cpu"));
 const memorySeries = computed(() => metrics.getSeriesData("memory"));
 const networkSeries = computed(() => metrics.getSeriesData("network"));
@@ -104,7 +110,7 @@ const alertBanner = computed(() => {
     };
   }
 
-  if (s.cpu >= 90 || s.errorRate >= 8) {
+  if (isInfrastructureMode.value && (s.cpu >= 90 || s.errorRate >= 8)) {
     return {
       msg: `CRITICAL — CPU ${s.cpu.toFixed(0)}% · Error rate ${s.errorRate.toFixed(1)}%`,
       level: "crit",
@@ -112,7 +118,10 @@ const alertBanner = computed(() => {
     };
   }
 
-  if (s.cpu >= 75 || s.errorRate >= 3 || security.high > 0) {
+  if (
+    (isInfrastructureMode.value && (s.cpu >= 75 || s.errorRate >= 3)) ||
+    security.high > 0
+  ) {
     return {
       msg: `WARNING — CPU ${s.cpu.toFixed(0)}% · High-risk events ${security.high}`,
       level: "warn",
@@ -220,50 +229,69 @@ const METRIC_CARDS = computed(() => [
   },
 ]);
 
-const healthCards = computed(() => [
+const healthCards = computed<
   {
-    label: "Critical Alerts",
-    value: alerts.counts.critical,
-    icon: ShieldAlert,
-    tone: "danger",
-  },
-  {
-    label: "Security Events",
-    value: analytics.securitySummary.total,
-    icon: RadioTower,
-    tone: "info",
-  },
-  {
-    label: "Geo Regions",
-    value: analytics.geoSummary.countries,
-    icon: Globe2,
-    tone: "blue",
-  },
-  {
-    label: "Market Symbols",
-    value: analytics.marketSummary.tracked,
-    icon: TrendingUp,
-    tone: "green",
-  },
-  {
-    label: "System Logs",
-    value: analytics.logSummary.total,
-    icon: FileText,
-    tone: "info",
-  },
-  {
-    label: "Datasets",
-    value: Object.values(analytics.datasetVisibility).filter(Boolean).length,
-    icon: Database,
-    tone: "green",
-  },
-  {
-    label: "Load",
-    value: `${metrics.summary.cpu.toFixed(0)}%`,
-    icon: CircleGauge,
-    tone: "blue",
-  },
-]);
+    label: string;
+    value: string | number;
+    icon: typeof ShieldAlert;
+    tone: string;
+  }[]
+>(() => {
+  const cards: {
+    label: string;
+    value: string | number;
+    icon: typeof ShieldAlert;
+    tone: string;
+  }[] = [
+    {
+      label: "Critical Alerts",
+      value: alerts.counts.critical,
+      icon: ShieldAlert,
+      tone: "danger",
+    },
+    {
+      label: "Security Events",
+      value: analytics.securitySummary.total,
+      icon: RadioTower,
+      tone: "info",
+    },
+    {
+      label: "Geo Regions",
+      value: analytics.geoSummary.countries,
+      icon: Globe2,
+      tone: "blue",
+    },
+    {
+      label: "Market Symbols",
+      value: analytics.marketSummary.tracked,
+      icon: TrendingUp,
+      tone: "green",
+    },
+    {
+      label: "System Logs",
+      value: analytics.logSummary.total,
+      icon: FileText,
+      tone: "info",
+    },
+    {
+      label: "Datasets",
+      value: Object.values(analytics.datasetVisibility).filter(Boolean).length,
+      icon: Database,
+      tone: "green",
+    },
+  ];
+
+  if (isInfrastructureMode.value) {
+    cards.push({
+      label: "Load",
+      value: `${metrics.summary.cpu.toFixed(0)}%`,
+      icon: CircleGauge,
+      tone: "blue",
+    });
+  }
+
+  return cards;
+});
 </script>
 
 <template>
@@ -340,7 +368,7 @@ const healthCards = computed(() => [
         </article>
       </section>
 
-      <section class="cards-row">
+      <section v-if="isInfrastructureMode" class="cards-row">
         <ErrorBoundary>
           <MetricCard
             v-for="card in METRIC_CARDS"
@@ -352,13 +380,7 @@ const healthCards = computed(() => [
         </ErrorBoundary>
       </section>
 
-      <section
-        v-if="
-          analytics.chartMode === 'overview' ||
-          analytics.chartMode === 'network'
-        "
-        class="charts-grid"
-      >
+      <section v-if="isInfrastructureMode" class="charts-grid">
         <article class="chart-card chart-wide">
           <div class="chart-card-head">
             <div>
@@ -614,14 +636,20 @@ const healthCards = computed(() => [
           "
         />
       </section>
-      <section class="bottom-grid">
-        <div class="bottom-left">
+      <section
+        v-if="isInfrastructureMode || analytics.chartMode === 'logs'"
+        class="bottom-grid"
+      >
+        <div v-if="isInfrastructureMode" class="bottom-left">
           <ErrorBoundary>
             <ProcessTable />
           </ErrorBoundary>
         </div>
 
-        <div class="bottom-right">
+        <div
+          v-if="isInfrastructureMode || analytics.chartMode === 'logs'"
+          class="bottom-right"
+        >
           <ErrorBoundary>
             <ActivityFeed />
           </ErrorBoundary>

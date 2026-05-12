@@ -11,8 +11,8 @@ const router = useRouter();
 const auth = useAuthStore();
 const preferences = usePreferencesStore();
 
-const name = ref(preferences.displayName || "");
-const email = ref(preferences.email || "");
+const name = ref("");
+const email = ref("");
 const password = ref("");
 
 const showPassword = ref(false);
@@ -29,9 +29,8 @@ function submitSignup() {
     return;
   }
 
-  const safeName = name.value.trim() || "Operations Analyst";
-  const safeEmail =
-    email.value.trim().toLowerCase() || "analyst@pulseops.local";
+  const safeName = name.value.trim();
+  const safeEmail = email.value.trim().toLowerCase();
 
   preferences.setDisplayName(safeName);
   preferences.setEmail(safeEmail);
@@ -56,6 +55,8 @@ function submitSignup() {
 
       <form class="auth-form" @submit.prevent="submitSignup">
         <input
+          id="signup-name"
+          name="name"
           v-model="name"
           type="text"
           placeholder="Your name"
@@ -64,6 +65,8 @@ function submitSignup() {
         />
 
         <input
+          id="signup-email"
+          name="email"
           v-model="email"
           type="email"
           placeholder="you@example.com"
@@ -75,6 +78,8 @@ function submitSignup() {
           Password
           <span class="password-field">
             <input
+              id="signup-password"
+              name="password"
               v-model="password"
               :type="passwordInputType"
               placeholder="Create password"

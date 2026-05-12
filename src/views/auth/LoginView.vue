@@ -12,7 +12,7 @@ const auth = useAuthStore();
 const toast = useToastStore();
 const preferences = usePreferencesStore();
 
-const email = ref(preferences.email || "");
+const email = ref("");
 const password = ref("");
 
 const showPassword = ref(false);
@@ -59,10 +59,13 @@ function submitLogin() {
         <label>
           Email
           <input
+            id="login-email"
+            name="email"
             v-model="email"
             type="email"
             placeholder="you@example.com"
             required
+            autocomplete="email"
           />
         </label>
 
