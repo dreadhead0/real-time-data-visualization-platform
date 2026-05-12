@@ -35,8 +35,8 @@ function submitSignup() {
   preferences.setDisplayName(safeName);
   preferences.setEmail(safeEmail);
 
-  toast.success("Account created. Welcome to PulseOps.");
-  router.push("/app");
+  toast.success("Account created. Please login to continue.");
+  router.push("/login");
 }
 </script>
 

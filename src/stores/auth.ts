@@ -47,11 +47,6 @@ export const useAuthStore = defineStore(
 
       registeredUsers.value.push(createdUser)
 
-      user.value = {
-        name: createdUser.name,
-        email: createdUser.email,
-      }
-
       return {
         ok: true,
         message: 'Account created successfully.',
