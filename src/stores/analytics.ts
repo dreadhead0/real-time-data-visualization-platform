@@ -66,13 +66,14 @@ export const useAnalyticsStore = defineStore(
     })
 
     const chartMode = ref<AdvancedChartMode>('overview')
+    const controlsOpen = ref(true)
     const datasetVisibility = ref<DatasetVisibility>({ ...defaultVisibility })
     const selectedSymbol = ref('BTC-USD')
     const securitySearch = ref('')
     const logSearch = ref('')
 
     const severityFilters = ref<SeverityFilters>({ ...defaultSeverityFilters })
-const logSeverityFilters = ref<LogSeverityFilters>({ ...defaultLogSeverityFilters })
+    const logSeverityFilters = ref<LogSeverityFilters>({ ...defaultLogSeverityFilters })
 
     function pushSecurityEvent(event: SecurityEvent): void {
       securityEvents.value.unshift(event)
@@ -182,6 +183,10 @@ function resetFilters(): void {
   logSearch.value = ''
   severityFilters.value = { ...defaultSeverityFilters }
   logSeverityFilters.value = { ...defaultLogSeverityFilters }
+}
+
+function toggleControls(): void {
+  controlsOpen.value = !controlsOpen.value
 }
 
  const visibleSecurityEvents = computed(() => {
@@ -347,6 +352,9 @@ function resetFilters(): void {
       setLogSearch,
       reset,
 
+      controlsOpen,
+      toggleControls,
+
       severityFilters,
       logSeverityFilters,
       toggleSeverityFilter,
@@ -358,13 +366,14 @@ function resetFilters(): void {
   },
   {
     persist: {
-        pick: [
-         'chartMode',
-         'datasetVisibility',
-         'selectedSymbol',
-         'severityFilters',
-         'logSeverityFilters',
-        ],
+     pick: [
+      'chartMode',
+      'controlsOpen',
+      'datasetVisibility',
+      'selectedSymbol',
+      'severityFilters',
+      'logSeverityFilters',
+    ],
     },
   },
 )

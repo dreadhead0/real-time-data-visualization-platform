@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { RouterLink, RouterView, useRouter } from "vue-router";
-import {
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
   Activity,
   BarChart3,
   Cpu,
@@ -21,10 +20,13 @@ import type { AdvancedChartMode } from "@/types/analytics";
 const sidebarOpen = ref(false);
 
 const router = useRouter();
+const route = useRoute();
 const preferences = usePreferencesStore();
 const analytics = useAnalyticsStore();
 
 const auth = useAuthStore();
+
+const isDashboardRoute = computed(() => route.name === 'dashboard')
 
 const initials = computed(() => {
   return preferences.displayName
@@ -86,8 +88,9 @@ function goToDashboardMode(mode: AdvancedChartMode) {
       <nav class="sidebar__nav">
         <button
           type="button"
-          :class="{ active: analytics.chartMode === 'overview' }"
-          @click="goToDashboardMode('overview')"
+          :class="{
+            active: isDashboardRoute && analytics.chartMode === 'overview',
+          }"
         >
           <BarChart3 :size="18" />
           Dashboard
@@ -95,8 +98,9 @@ function goToDashboardMode(mode: AdvancedChartMode) {
 
         <button
           type="button"
-          :class="{ active: analytics.chartMode === 'network' }"
-          @click="goToDashboardMode('network')"
+          :class="{
+            active: isDashboardRoute && analytics.chartMode === 'network',
+          }"
         >
           <Cpu :size="18" />
           Infrastructure
@@ -104,8 +108,9 @@ function goToDashboardMode(mode: AdvancedChartMode) {
 
         <button
           type="button"
-          :class="{ active: analytics.chartMode === 'security' }"
-          @click="goToDashboardMode('security')"
+          :class="{
+            active: isDashboardRoute && analytics.chartMode === 'security',
+          }"
         >
           <Shield :size="18" />
           Security
@@ -113,8 +118,9 @@ function goToDashboardMode(mode: AdvancedChartMode) {
 
         <button
           type="button"
-          :class="{ active: analytics.chartMode === 'geography' }"
-          @click="goToDashboardMode('geography')"
+          :class="{
+            active: isDashboardRoute && analytics.chartMode === 'geography',
+          }"
         >
           <Globe2 :size="18" />
           Geography

@@ -1957,3 +1957,34 @@ html[data-theme='light'] .toast-card {
     width: auto;
   }
 }
+
+/* Logout danger interaction */
+.sidebar__logout {
+  color: var(--text-secondary);
+  transition:
+    color 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.sidebar__logout:hover {
+  color: var(--neon-red);
+  background: rgba(244, 63, 94, 0.09);
+  border-color: rgba(244, 63, 94, 0.26);
+  box-shadow: 0 0 24px rgba(244, 63, 94, 0.12);
+  transform: translateX(2px);
+}
+
+.sidebar__logout:active {
+  color: #fff;
+  background: rgba(244, 63, 94, 0.22);
+  border-color: rgba(244, 63, 94, 0.45);
+  transform: translateX(2px) scale(0.98);
+}
+
+.sidebar__logout:hover svg,
+.sidebar__logout:active svg {
+  color: var(--neon-red);
+}

@@ -65,8 +65,6 @@ const metrics = useMetricsStore();
 const alerts = useAlertsStore();
 const analytics = useAnalyticsStore();
 
-const controlsOpen = ref(true);
-
 const cpuSeries = computed(() => metrics.getSeriesData("cpu"));
 const memorySeries = computed(() => metrics.getSeriesData("memory"));
 const networkSeries = computed(() => metrics.getSeriesData("network"));
@@ -312,18 +310,18 @@ const healthCards = computed(() => [
         <button
           class="controls-toggle"
           type="button"
-          @click="controlsOpen = !controlsOpen"
+          @click="analytics.toggleControls"
         >
           <span>
             <SlidersHorizontal :size="16" />
-            {{ controlsOpen ? "Hide controls" : "Show controls" }}
+            {{ analytics.controlsOpen ? "Hide controls" : "Show controls" }}
           </span>
 
           <small> {{ analytics.chartMode }} mode </small>
         </button>
 
         <Transition name="controls-collapse">
-          <AdvancedDashboardControls v-if="controlsOpen" />
+          <AdvancedDashboardControls v-if="analytics.controlsOpen" />
         </Transition>
       </div>
 
