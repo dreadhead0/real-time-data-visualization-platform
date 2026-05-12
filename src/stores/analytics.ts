@@ -373,7 +373,7 @@ function toggleControls(): void {
       'selectedSymbol',
       'severityFilters',
       'logSeverityFilters',
-    ],
+      ],
     },
   },
 )

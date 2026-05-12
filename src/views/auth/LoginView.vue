@@ -30,8 +30,7 @@ function submitLogin() {
   }
 
   if (result.user) {
-    preferences.setDisplayName(result.user.name);
-    preferences.setEmail(result.user.email);
+    preferences.activateUser(result.user.email, result.user.name);
   }
 
   toast.success("Welcome back to PulseOps.");

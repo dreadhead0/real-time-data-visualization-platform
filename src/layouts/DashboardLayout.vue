@@ -45,6 +45,7 @@ function toggleTheme() {
 
 function logout() {
   auth.logout();
+  preferences.clearActiveUser();
   sidebarOpen.value = false;
   router.push("/");
 }

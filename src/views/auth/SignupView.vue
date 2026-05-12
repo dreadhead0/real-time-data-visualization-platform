@@ -32,8 +32,8 @@ function submitSignup() {
   const safeName = name.value.trim();
   const safeEmail = email.value.trim().toLowerCase();
 
-  preferences.setDisplayName(safeName);
-  preferences.setEmail(safeEmail);
+  preferences.activateUser(safeEmail, safeName);
+  preferences.clearActiveUser();
 
   toast.success("Account created. Please login to continue.");
   router.push("/login");
