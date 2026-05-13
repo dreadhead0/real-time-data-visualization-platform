@@ -20,17 +20,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView,
-      meta: {
-        guestOnly: true,
-      },
     },
     {
       path: '/signup',
       name: 'signup',
       component: SignupView,
-      meta: {
-        guestOnly: true,
-      },
     },
     {
       path: '/app',
@@ -63,12 +57,6 @@ router.beforeEach((to) => {
       query: {
         redirect: to.fullPath,
       },
-    }
-  }
-
-  if (to.meta.guestOnly && auth.isAuthenticated) {
-    return {
-      name: 'dashboard',
     }
   }
 

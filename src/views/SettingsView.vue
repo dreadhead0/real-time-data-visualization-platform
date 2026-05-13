@@ -14,13 +14,25 @@ import {
   User,
 } from "lucide-vue-next";
 import { usePreferencesStore, type ThemeMode } from "@/stores/preferences";
+import { useToastStore } from "@/stores/toast";
 
 const preferences = usePreferencesStore();
 
 const nameDraft = ref(preferences.displayName);
 const roleDraft = ref(preferences.role);
 const emailDraft = ref(preferences.email);
+
+const isProfileDirty = computed(() => {
+  return (
+    nameDraft.value.trim() !== preferences.displayName ||
+    roleDraft.value.trim() !== preferences.role ||
+    emailDraft.value.trim().toLowerCase() !== preferences.email
+  );
+});
+
 const fileInput = ref<HTMLInputElement | null>(null);
+
+const toast = useToastStore();
 
 const themeOptions: {
   label: string;
@@ -58,9 +70,16 @@ const initials = computed(() => {
 });
 
 function saveProfile() {
+  if (!isProfileDirty.value) {
+    toast.info("No profile changes to save.");
+    return;
+  }
+
   preferences.setDisplayName(nameDraft.value);
   preferences.setRole(roleDraft.value);
   preferences.setEmail(emailDraft.value);
+
+  toast.success("Profile settings saved.");
 }
 
 function resetProfile() {
@@ -68,6 +87,8 @@ function resetProfile() {
   nameDraft.value = preferences.displayName;
   roleDraft.value = preferences.role;
   emailDraft.value = preferences.email;
+
+  toast.info("Profile reset to defaults.");
 }
 
 function openFilePicker() {
@@ -212,7 +233,11 @@ function handleAvatarUpload(event: Event) {
           </label>
 
           <div class="button-row">
-            <button class="primary-button" type="submit">
+            <button
+              class="primary-button"
+              type="submit"
+              :disabled="!isProfileDirty"
+            >
               <Check :size="16" />
               Save profile
             </button>

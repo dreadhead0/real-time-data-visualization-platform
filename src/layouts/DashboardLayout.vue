@@ -46,6 +46,7 @@ function toggleTheme() {
 function logout() {
   auth.logout();
   preferences.clearActiveUser();
+  analytics.clearDashboardUser();
   sidebarOpen.value = false;
   router.push("/");
 }

@@ -2030,3 +2030,175 @@ html[data-theme='light'] .preview-metrics span {
   border-color: rgba(15, 23, 42, 0.12);
   color: #0f172a;
 }
+
+.primary-button:disabled,
+.secondary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Stable sidebar layout with logout pinned at bottom */
+.sidebar {
+  height: 100dvh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar__nav {
+  flex: 0 0 auto;
+}
+
+.sidebar__logout {
+  margin-top: auto;
+  margin-bottom: 1rem;
+  width: 100%;
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.9rem;
+}
+
+@media (max-width: 920px) {
+  .sidebar {
+    overflow-y: auto;
+  }
+
+  .sidebar__logout {
+    margin-top: 2rem;
+  }
+}
+
+/* Final app shell layout fix: sidebar column + scrollable workspace */
+@media (min-width: 921px) {
+  .app-shell {
+    --sidebar-width: 14rem;
+
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    display: grid;
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    overflow: hidden;
+  }
+
+  .sidebar {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+
+    width: var(--sidebar-width) !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    z-index: 20;
+  }
+
+  .workspace {
+    margin-left: 0 !important;
+    width: 100%;
+    min-width: 0;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .sidebar__nav {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding-bottom: 1rem;
+  }
+
+  .sidebar__logout {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+
+    margin-top: auto !important;
+    margin-bottom: 1rem !important;
+    width: 100%;
+  }
+}
+
+@media (max-width: 920px) {
+  .app-shell {
+    display: block;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    overflow-y: auto !important;
+    z-index: 50;
+  }
+
+  .workspace {
+    margin-left: 0 !important;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .sidebar__logout {
+    position: static !important;
+    margin-top: 2rem !important;
+    margin-bottom: 1rem !important;
+    width: 100%;
+  }
+}
+
+@media (min-width: 921px) {
+  .app-shell {
+    --sidebar-width: 16rem;
+  }
+
+  .sidebar {
+    padding: 0.75rem;
+  }
+
+  .sidebar__nav {
+    flex: 0 0 auto;
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 1.25rem;
+    overflow: visible;
+  }
+
+  .sidebar__nav button,
+  .sidebar__nav a {
+    min-height: 2.85rem;
+    padding: 0.75rem 0.8rem;
+    border-radius: 0.8rem;
+  }
+
+  .sidebar__logout {
+    margin-top: auto !important;
+    margin-bottom: 0.75rem !important;
+    min-height: 2.65rem;
+    padding: 0.75rem 0.8rem;
+    border-radius: 0.8rem;
+  }
+
+  .sidebar-profile {
+    margin-top: 1rem;
+    padding: 0.65rem;
+  }
+}

@@ -45,6 +45,26 @@ const defaultLogSeverityFilters: LogSeverityFilters = {
   critical: true,
 }
 
+interface DashboardPreferences {
+  chartMode: AdvancedChartMode
+  controlsOpen: boolean
+  datasetVisibility: DatasetVisibility
+  selectedSymbol: string
+  severityFilters: SeverityFilters
+  logSeverityFilters: LogSeverityFilters
+}
+
+function createDefaultDashboardPreferences(): DashboardPreferences {
+  return {
+    chartMode: 'overview',
+    controlsOpen: true,
+    datasetVisibility: { ...defaultVisibility },
+    selectedSymbol: 'BTC-USD',
+    severityFilters: { ...defaultSeverityFilters },
+    logSeverityFilters: { ...defaultLogSeverityFilters },
+  }
+}
+
 export const useAnalyticsStore = defineStore(
   'analytics',
   () => {
@@ -64,16 +84,63 @@ export const useAnalyticsStore = defineStore(
       throughput: 78,
       stability: 88,
     })
+const activeEmail = ref('')
+const dashboardPreferencesByEmail = ref<Record<string, DashboardPreferences>>({})
+const fallbackDashboardPreferences = ref<DashboardPreferences>(
+  createDefaultDashboardPreferences(),
+)
 
-    const chartMode = ref<AdvancedChartMode>('overview')
-    const controlsOpen = ref(true)
-    const datasetVisibility = ref<DatasetVisibility>({ ...defaultVisibility })
-    const selectedSymbol = ref('BTC-USD')
+const currentDashboardPreferences = computed(() => {
+  if (!activeEmail.value) return fallbackDashboardPreferences.value
+
+  if (!dashboardPreferencesByEmail.value[activeEmail.value]) {
+    dashboardPreferencesByEmail.value[activeEmail.value] =
+      createDefaultDashboardPreferences()
+  }
+
+  return dashboardPreferencesByEmail.value[activeEmail.value]
+})
+
+const chartMode = computed(() => currentDashboardPreferences.value.chartMode)
+const controlsOpen = computed(() => currentDashboardPreferences.value.controlsOpen)
+const datasetVisibility = computed(() => currentDashboardPreferences.value.datasetVisibility)
+const selectedSymbol = computed(() => currentDashboardPreferences.value.selectedSymbol)
+const severityFilters = computed(() => currentDashboardPreferences.value.severityFilters)
+const logSeverityFilters = computed(() => currentDashboardPreferences.value.logSeverityFilters)
+
+function activateDashboardUser(emailValue: string): void {
+  const safeEmail = emailValue.trim().toLowerCase()
+  if (!safeEmail) return
+
+  activeEmail.value = safeEmail
+
+  if (!dashboardPreferencesByEmail.value[safeEmail]) {
+    dashboardPreferencesByEmail.value[safeEmail] =
+      createDefaultDashboardPreferences()
+  }
+}
+
+function clearDashboardUser(): void {
+  activeEmail.value = ''
+}
+
+function patchDashboardPreferences(patch: Partial<DashboardPreferences>): void {
+  if (!activeEmail.value) {
+    fallbackDashboardPreferences.value = {
+      ...fallbackDashboardPreferences.value,
+      ...patch,
+    }
+    return
+  }
+
+  dashboardPreferencesByEmail.value[activeEmail.value] = {
+    ...currentDashboardPreferences.value,
+    ...patch,
+  }
+}
+
     const securitySearch = ref('')
     const logSearch = ref('')
-
-    const severityFilters = ref<SeverityFilters>({ ...defaultSeverityFilters })
-    const logSeverityFilters = ref<LogSeverityFilters>({ ...defaultLogSeverityFilters })
 
     function pushSecurityEvent(event: SecurityEvent): void {
       securityEvents.value.unshift(event)
@@ -120,26 +187,30 @@ export const useAnalyticsStore = defineStore(
     }
 
     function setChartMode(mode: AdvancedChartMode): void {
-      chartMode.value = mode
-    }
+  patchDashboardPreferences({ chartMode: mode })
+}
 
     function setSelectedSymbol(symbol: string): void {
-      selectedSymbol.value = symbol
-    }
+  patchDashboardPreferences({ selectedSymbol: symbol })
+}
 
-    function toggleDataset(key: keyof DatasetVisibility): void {
-      datasetVisibility.value = {
-        ...datasetVisibility.value,
-        [key]: !datasetVisibility.value[key],
-      }
-    }
+   function toggleDataset(key: keyof DatasetVisibility): void {
+  patchDashboardPreferences({
+    datasetVisibility: {
+      ...datasetVisibility.value,
+      [key]: !datasetVisibility.value[key],
+    },
+  })
+}
 
-    function setDatasetVisibility(key: keyof DatasetVisibility, value: boolean): void {
-      datasetVisibility.value = {
-        ...datasetVisibility.value,
-        [key]: value,
-      }
-    }
+   function setDatasetVisibility(key: keyof DatasetVisibility, value: boolean): void {
+  patchDashboardPreferences({
+    datasetVisibility: {
+      ...datasetVisibility.value,
+      [key]: value,
+    },
+  })
+}
 
     function setSecuritySearch(value: string): void {
       securitySearch.value = value
@@ -149,44 +220,57 @@ export const useAnalyticsStore = defineStore(
       logSearch.value = value
     }
 
-    function toggleSeverityFilter(key: keyof SeverityFilters): void {
-  severityFilters.value = {
-    ...severityFilters.value,
-    [key]: !severityFilters.value[key],
-  }
+function toggleSeverityFilter(key: keyof SeverityFilters): void {
+  patchDashboardPreferences({
+    severityFilters: {
+      ...severityFilters.value,
+      [key]: !severityFilters.value[key],
+    },
+  })
 }
 
 function toggleLogSeverityFilter(key: keyof LogSeverityFilters): void {
-  logSeverityFilters.value = {
-    ...logSeverityFilters.value,
-    [key]: !logSeverityFilters.value[key],
-  }
+  patchDashboardPreferences({
+    logSeverityFilters: {
+      ...logSeverityFilters.value,
+      [key]: !logSeverityFilters.value[key],
+    },
+  })
 }
 
 function enableAllDatasets(): void {
-  datasetVisibility.value = { ...defaultVisibility }
+  patchDashboardPreferences({
+    datasetVisibility: { ...defaultVisibility },
+  })
 }
 
 function disableAllDatasets(): void {
-  datasetVisibility.value = {
-    infrastructure: false,
-    security: false,
-    geography: false,
-    markets: false,
-    networkGraph: false,
-    logs: false,
-  }
+  patchDashboardPreferences({
+    datasetVisibility: {
+      infrastructure: false,
+      security: false,
+      geography: false,
+      markets: false,
+      networkGraph: false,
+      logs: false,
+    },
+  })
 }
 
 function resetFilters(): void {
   securitySearch.value = ''
   logSearch.value = ''
-  severityFilters.value = { ...defaultSeverityFilters }
-  logSeverityFilters.value = { ...defaultLogSeverityFilters }
+
+  patchDashboardPreferences({
+    severityFilters: { ...defaultSeverityFilters },
+    logSeverityFilters: { ...defaultLogSeverityFilters },
+  })
 }
 
 function toggleControls(): void {
-  controlsOpen.value = !controlsOpen.value
+  patchDashboardPreferences({
+    controlsOpen: !controlsOpen.value,
+  })
 }
 
  const visibleSecurityEvents = computed(() => {
@@ -328,6 +412,11 @@ function toggleControls(): void {
       securitySearch,
       logSearch,
 
+      activeEmail,
+      dashboardPreferencesByEmail,
+      activateDashboardUser,
+      clearDashboardUser,
+
       visibleSecurityEvents,
       visibleLogs,
       selectedMarketTicks,
@@ -365,15 +454,11 @@ function toggleControls(): void {
     }
   },
   {
-    persist: {
-     pick: [
-      'chartMode',
-      'controlsOpen',
-      'datasetVisibility',
-      'selectedSymbol',
-      'severityFilters',
-      'logSeverityFilters',
-      ],
-    },
+persist: {
+  pick: [
+    'activeEmail',
+    'dashboardPreferencesByEmail',
+  ],
+},
   },
 )

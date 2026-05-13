@@ -6,11 +6,15 @@ import { useAuthStore } from "@/stores/auth";
 import { usePreferencesStore } from "@/stores/preferences";
 import { useToastStore } from "@/stores/toast";
 
+import { useAnalyticsStore } from "@/stores/analytics";
+
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
 const toast = useToastStore();
 const preferences = usePreferencesStore();
+
+const analytics = useAnalyticsStore();
 
 const email = ref("");
 const password = ref("");
@@ -31,6 +35,7 @@ function submitLogin() {
 
   if (result.user) {
     preferences.activateUser(result.user.email, result.user.name);
+    analytics.activateDashboardUser(result.user.email);
   }
 
   toast.success("Welcome back to PulseOps.");
