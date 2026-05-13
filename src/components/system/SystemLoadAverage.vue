@@ -72,7 +72,8 @@ const loadRows = computed(() => {
 
 <style scoped>
 .load-card {
-  min-height: 220px;
+  height: 100%;
+  min-height: 360px;
   padding: 1rem;
   border-radius: 1.2rem;
   border: 1px solid rgba(148, 163, 184, 0.12);
@@ -84,6 +85,20 @@ const loadRows = computed(() => {
     ),
     rgba(13, 18, 32, 0.82);
   box-shadow: 0 20px 55px rgba(0, 0, 0, 0.24);
+  display: flex;
+  flex-direction: column;
+}
+
+.load-list {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.load-foot {
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .load-head span {

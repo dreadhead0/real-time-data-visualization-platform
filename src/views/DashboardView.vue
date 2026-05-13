@@ -1036,9 +1036,25 @@ const healthCards = computed<
 
 .log-load-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.8fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(360px, 0.65fr);
   gap: 1rem;
   align-items: stretch;
+}
+
+.log-panel,
+.load-panel {
+  min-width: 0;
+  height: 100%;
+}
+
+.load-panel {
+  display: flex;
+}
+
+.load-panel :deep(.load-card) {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
 }
 
 .log-panel,

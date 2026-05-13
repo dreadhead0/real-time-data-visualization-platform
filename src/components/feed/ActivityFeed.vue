@@ -132,6 +132,7 @@ function onScroll() {
     <div class="feed-table-head">
       <span>TIME</span>
       <span>SEV</span>
+      <span>SOURCE</span>
       <span>METRIC</span>
       <span>MESSAGE</span>
       <span>VALUE</span>
@@ -149,12 +150,30 @@ function onScroll() {
         :class="`row-${alert.severity}`"
       >
         <span class="col-time">{{ formatTime(alert.timestamp) }}</span>
+
         <span class="col-sev" :class="`sev-${alert.severity}`">
           <span class="sev-dot" />
           {{ SEVERITY_LABELS[alert.severity] }}
         </span>
+
+        <span class="col-source">
+          {{
+            alert.metric === "cpu"
+              ? "node"
+              : alert.metric === "memory"
+                ? "worker"
+                : alert.metric === "network"
+                  ? "gateway"
+                  : alert.metric === "throughput"
+                    ? "api"
+                    : "monitor"
+          }}
+        </span>
+
         <span class="col-metric">{{ alert.metric.toUpperCase() }}</span>
+
         <span class="col-msg">{{ alert.message }}</span>
+
         <span class="col-val">{{ alert.value.toFixed(1) }}</span>
       </div>
     </div>
@@ -341,9 +360,9 @@ function onScroll() {
 
 .feed-table-head {
   display: grid;
-  grid-template-columns: 88px 72px 120px minmax(260px, 520px) 76px;
+  grid-template-columns: 88px 72px 100px 120px minmax(280px, 1fr) 72px;
   column-gap: 1rem;
-  justify-content: start;
+  align-items: center;
   padding: 6px 18px;
   border-bottom: 1px solid var(--border-dim);
   font-size: 9px;
@@ -378,11 +397,9 @@ function onScroll() {
 
 .feed-row {
   display: grid;
-  grid-template-columns: 88px 72px 120px minmax(260px, 520px) 76px;
+  grid-template-columns: 88px 72px 100px 120px minmax(280px, 1fr) 72px;
   column-gap: 1rem;
-  justify-content: start;
   align-items: center;
-  gap: 0;
   padding: 7px 18px;
   font-size: 11px;
   font-family: var(--font-mono);
@@ -433,6 +450,38 @@ function onScroll() {
   height: 5px;
   border-radius: 50%;
   flex-shrink: 0;
+}
+
+.col-source {
+  color: var(--text-secondary);
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.col-metric {
+  color: var(--text-secondary);
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.col-msg {
+  min-width: 0;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 8px;
+}
+
+.col-val {
+  color: var(--text-secondary);
+  text-align: right;
+  justify-self: end;
+  font-variant-numeric: tabular-nums;
 }
 .col-sev.sev-critical .sev-dot {
   background: var(--neon-red);
@@ -533,15 +582,17 @@ function onScroll() {
   flex: 0 0 auto;
   border-top: 1px solid var(--border-dim);
   background: rgba(13, 18, 32, 0.92);
-  padding: 0.65rem 0.75rem;
+  padding: 0.75rem;
+  display: flex;
+  justify-content: center;
 }
 
 .feed-load-more {
-  width: 100%;
+  width: min(360px, 100%);
   margin: 0;
   min-height: 34px;
-  border-radius: 9px;
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.24);
   background: rgba(56, 189, 248, 0.07);
   color: var(--neon-blue);
   font-family: var(--font-mono);
@@ -554,16 +605,43 @@ function onScroll() {
 
 .feed-load-more:hover {
   background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.38);
+}
+.feed-load-more:hover {
+  background: rgba(56, 189, 248, 0.12);
   border-color: rgba(56, 189, 248, 0.34);
 }
 
 .feed-end {
-  padding: 0.4rem;
+  width: min(420px, 100%);
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.06);
   color: var(--text-dim);
   font-family: var(--font-mono);
   font-size: 10px;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+}
+
+@media (max-width: 900px) {
+  .feed-table-head,
+  .feed-row {
+    grid-template-columns: 78px 68px 90px 96px minmax(180px, 1fr) 56px;
+    column-gap: 0.5rem;
+  }
+}
+
+@media (max-width: 680px) {
+  .col-source,
+  .feed-table-head span:nth-child(3) {
+    display: none;
+  }
+
+  .feed-table-head,
+  .feed-row {
+    grid-template-columns: 78px 68px 96px minmax(160px, 1fr) 56px;
+  }
 }
 </style>
