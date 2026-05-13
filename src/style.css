@@ -2202,3 +2202,35 @@ html[data-theme='light'] .preview-metrics span {
     padding: 0.65rem;
   }
 }
+
+.chart-card > canvas,
+.chart-card svg,
+.chart-card .line-area-chart,
+.chart-card .chart-host {
+  min-height: 220px;
+}
+
+/* Remove heavy blue glow under primary buttons */
+.primary-button,
+.full-button,
+.auth-form .primary-button,
+.auth-form .full-button {
+  box-shadow: none !important;
+}
+
+.primary-button:hover,
+.full-button:hover,
+.auth-form .primary-button:hover,
+.auth-form .full-button:hover {
+  box-shadow: none !important;
+  transform: translateY(-1px);
+}
+
+.primary-button:focus,
+.primary-button:focus-visible,
+.full-button:focus,
+.full-button:focus-visible {
+  box-shadow: none !important;
+  outline: 2px solid rgba(56, 189, 248, 0.35);
+  outline-offset: 2px;
+}

@@ -58,6 +58,8 @@ import DashboardControls from "@/components/controls/DashboardControls.vue";
 import ProcessTable from "@/components/tables/ProcessTable.vue";
 import ErrorBoundary from "@/components/ui/ErrorBoundary.vue";
 
+import SystemLoadAverage from "@/components/system/SystemLoadAverage.vue";
+
 useStreamConnection();
 useAnalyticsStream();
 
@@ -394,6 +396,7 @@ const healthCards = computed<
 
           <ErrorBoundary>
             <LineAreaChart
+              :key="`cpu-${analytics.chartMode}`"
               :series-data="cpuSeries"
               metric="cpu"
               color="#38bdf8"
@@ -415,6 +418,7 @@ const healthCards = computed<
 
           <ErrorBoundary>
             <LineAreaChart
+              :key="`memory-${analytics.chartMode}`"
               :series-data="memorySeries"
               metric="memory"
               color="#22c55e"
@@ -436,6 +440,7 @@ const healthCards = computed<
 
           <ErrorBoundary>
             <LineAreaChart
+              :key="`network-${analytics.chartMode}`"
               :series-data="networkSeries"
               metric="network"
               color="#06b6d4"
@@ -500,6 +505,8 @@ const healthCards = computed<
 
             <div class="chart-inline-controls">
               <select
+                id="market-symbol-select"
+                name="marketSymbol"
                 class="chart-select"
                 :value="analytics.selectedSymbol"
                 @change="
@@ -640,10 +647,12 @@ const healthCards = computed<
         v-if="isInfrastructureMode || analytics.chartMode === 'logs'"
         class="bottom-grid"
       >
-        <div v-if="isInfrastructureMode" class="bottom-left">
+        <div v-if="isInfrastructureMode" class="bottom-left infra-stack">
           <ErrorBoundary>
             <ProcessTable />
           </ErrorBoundary>
+
+          <SystemLoadAverage />
         </div>
 
         <div
@@ -726,6 +735,11 @@ const healthCards = computed<
   gap: 0.8rem;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+.infra-stack {
+  display: grid;
+  gap: 1rem;
 }
 
 .clock-card {

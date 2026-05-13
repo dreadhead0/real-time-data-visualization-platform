@@ -100,13 +100,18 @@ function onScroll() {
       <div class="search-wrap">
         <span class="search-icon">⌕</span>
         <input
+          id="activity-feed-search"
+          name="activityFeedSearch"
           :value="store.searchQuery"
           placeholder="Search events…"
           class="feed-search"
+          autocomplete="off"
           @input="store.setSearch(($event.target as HTMLInputElement).value)"
         />
       </div>
       <select
+        id="activity-feed-severity"
+        name="activityFeedSeverity"
         :value="store.severityFilter"
         class="feed-filter"
         @change="
@@ -152,19 +157,19 @@ function onScroll() {
         <span class="col-msg">{{ alert.message }}</span>
         <span class="col-val">{{ alert.value.toFixed(1) }}</span>
       </div>
+    </div>
 
-      <button
-        v-if="canLoadMore"
-        class="feed-load-more"
-        type="button"
-        @click="loadMoreEvents"
-      >
-        Load older events
-      </button>
+    <button
+      v-if="canLoadMore"
+      class="feed-load-more"
+      type="button"
+      @click="loadMoreEvents"
+    >
+      Load older events
+    </button>
 
-      <div v-else-if="store.filtered.length > 0" class="feed-end">
-        End of buffered event history
-      </div>
+    <div v-else-if="store.filtered.length > 0" class="feed-end">
+      End of buffered event history
     </div>
 
     <div
@@ -336,7 +341,7 @@ function onScroll() {
 
 .feed-table-head {
   display: grid;
-  grid-template-columns: 90px 80px 80px 1fr 60px;
+  grid-template-columns: 82px 68px 104px minmax(160px, 1fr) 56px;
   padding: 6px 18px;
   border-bottom: 1px solid var(--border-dim);
   font-size: 9px;
@@ -371,7 +376,7 @@ function onScroll() {
 
 .feed-row {
   display: grid;
-  grid-template-columns: 90px 80px 80px 1fr 60px;
+  grid-template-columns: 82px 68px 104px minmax(160px, 1fr) 56px;
   align-items: center;
   gap: 0;
   padding: 7px 18px;
@@ -406,12 +411,18 @@ function onScroll() {
 }
 
 .col-sev {
-  display: flex;
+  width: fit-content;
+  max-width: max-content;
+  justify-self: start;
+  display: inline-flex;
   align-items: center;
   gap: 5px;
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.35rem;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 800;
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 .sev-dot {
   width: 5px;
@@ -448,17 +459,39 @@ function onScroll() {
   color: var(--neon-blue);
 }
 
+.col-sev.sev-critical {
+  color: var(--neon-red);
+  background: rgba(244, 63, 94, 0.09);
+}
+
+.col-sev.sev-error {
+  color: #fb923c;
+  background: rgba(251, 146, 60, 0.09);
+}
+
+.col-sev.sev-warning {
+  color: var(--neon-amber);
+  background: rgba(251, 191, 36, 0.09);
+}
+
+.col-sev.sev-info {
+  color: var(--neon-blue);
+  background: rgba(56, 189, 248, 0.09);
+}
+
 .col-metric {
   color: var(--text-secondary);
   font-size: 10px;
 }
 .col-msg {
+  min-width: 0;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   padding-right: 8px;
 }
+
 .col-val {
   color: var(--text-secondary);
   text-align: right;
@@ -478,9 +511,16 @@ function onScroll() {
   background: rgba(56, 189, 248, 0.06);
 }
 
+.feed-footer {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--border-dim);
+  background: rgba(13, 18, 32, 0.92);
+  padding: 0.65rem 0.75rem;
+}
+
 .feed-load-more {
-  width: calc(100% - 36px);
-  margin: 10px 18px 12px;
+  width: 100%;
+  margin: 0;
   min-height: 34px;
   border-radius: 9px;
   border: 1px solid rgba(56, 189, 248, 0.2);
@@ -500,7 +540,7 @@ function onScroll() {
 }
 
 .feed-end {
-  padding: 12px 18px 16px;
+  padding: 0.4rem;
   color: var(--text-dim);
   font-family: var(--font-mono);
   font-size: 10px;
