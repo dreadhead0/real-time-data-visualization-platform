@@ -624,45 +624,50 @@ const healthCards = computed<
 
       <section
         v-if="
-          analytics.datasetVisibility.security ||
-          analytics.datasetVisibility.logs
+          analytics.datasetVisibility.security &&
+          ['overview', 'security'].includes(analytics.chartMode)
         "
-        class="inspector-grid"
+        class="security-stream-full"
       >
-        <SecurityEventsTable
-          v-if="
-            analytics.datasetVisibility.security &&
-            ['overview', 'security'].includes(analytics.chartMode)
-          "
-        />
+        <SecurityEventsTable />
+      </section>
 
-        <SystemLogsTable
+      <section
+        v-if="
+          (analytics.datasetVisibility.logs &&
+            ['overview', 'logs'].includes(analytics.chartMode)) ||
+          isInfrastructureMode
+        "
+        class="log-load-grid"
+      >
+        <div
           v-if="
             analytics.datasetVisibility.logs &&
             ['overview', 'logs'].includes(analytics.chartMode)
           "
-        />
-      </section>
-      <section
-        v-if="isInfrastructureMode || analytics.chartMode === 'logs'"
-        class="bottom-grid"
-      >
-        <div v-if="isInfrastructureMode" class="bottom-left infra-stack">
-          <ErrorBoundary>
-            <ProcessTable />
-          </ErrorBoundary>
+          class="log-panel"
+        >
+          <SystemLogsTable />
+        </div>
 
+        <div v-if="isInfrastructureMode" class="load-panel">
           <SystemLoadAverage />
         </div>
+      </section>
 
-        <div
-          v-if="isInfrastructureMode || analytics.chartMode === 'logs'"
-          class="bottom-right"
-        >
-          <ErrorBoundary>
-            <ActivityFeed />
-          </ErrorBoundary>
-        </div>
+      <section v-if="isInfrastructureMode" class="process-monitor-full">
+        <ErrorBoundary>
+          <ProcessTable />
+        </ErrorBoundary>
+      </section>
+
+      <section
+        v-if="isInfrastructureMode || analytics.chartMode === 'logs'"
+        class="activity-log-full"
+      >
+        <ErrorBoundary>
+          <ActivityFeed />
+        </ErrorBoundary>
       </section>
     </main>
   </section>
@@ -735,11 +740,6 @@ const healthCards = computed<
   gap: 0.8rem;
   flex-wrap: wrap;
   justify-content: flex-end;
-}
-
-.infra-stack {
-  display: grid;
-  gap: 1rem;
 }
 
 .clock-card {
@@ -912,12 +912,6 @@ const healthCards = computed<
   gap: 1rem;
 }
 
-.inspector-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
-  gap: 1rem;
-}
-
 .chart-full {
   grid-column: span 4;
 }
@@ -1036,11 +1030,56 @@ const healthCards = computed<
   border-color: rgba(6, 182, 212, 0.18);
 }
 
-.bottom-grid {
+.security-stream-full {
+  min-width: 0;
+}
+
+.log-load-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(360px, 0.65fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.8fr);
   gap: 1rem;
+  align-items: stretch;
+}
+
+.log-panel,
+.load-panel,
+.process-monitor-full,
+.activity-log-full {
+  min-width: 0;
+}
+
+.process-monitor-full {
   min-height: 430px;
+}
+
+.activity-log-full {
+  min-height: 560px;
+}
+
+.activity-log-full :deep(.feed-wrapper) {
+  min-height: 560px;
+}
+
+@media (max-width: 1180px) {
+  .log-load-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-log-full {
+    min-height: 460px;
+  }
+
+  .activity-log-full :deep(.feed-wrapper) {
+    min-height: 460px;
+  }
+}
+
+.activity-log-full {
+  min-height: 520px;
+}
+
+.activity-log-full :deep(.feed-wrapper) {
+  min-height: 520px;
 }
 
 .bottom-left,
@@ -1088,6 +1127,14 @@ const healthCards = computed<
 
   .inspector-grid {
     grid-template-columns: 1fr;
+  }
+
+  .activity-log-full {
+    min-height: 460px;
+  }
+
+  .activity-log-full :deep(.feed-wrapper) {
+    min-height: 460px;
   }
 }
 

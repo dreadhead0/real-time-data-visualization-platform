@@ -341,7 +341,9 @@ function onScroll() {
 
 .feed-table-head {
   display: grid;
-  grid-template-columns: 82px 68px 104px minmax(160px, 1fr) 56px;
+  grid-template-columns: 88px 72px 120px minmax(260px, 520px) 76px;
+  column-gap: 1rem;
+  justify-content: start;
   padding: 6px 18px;
   border-bottom: 1px solid var(--border-dim);
   font-size: 9px;
@@ -376,7 +378,9 @@ function onScroll() {
 
 .feed-row {
   display: grid;
-  grid-template-columns: 82px 68px 104px minmax(160px, 1fr) 56px;
+  grid-template-columns: 88px 72px 120px minmax(260px, 520px) 76px;
+  column-gap: 1rem;
+  justify-content: start;
   align-items: center;
   gap: 0;
   padding: 7px 18px;
@@ -494,7 +498,21 @@ function onScroll() {
 
 .col-val {
   color: var(--text-secondary);
-  text-align: right;
+  text-align: left;
+  justify-self: start;
+}
+
+@media (max-width: 900px) {
+  .feed-table-head,
+  .feed-row {
+    grid-template-columns: 78px 68px 96px minmax(160px, 1fr) 56px;
+    column-gap: 0.5rem;
+  }
+
+  .col-val {
+    text-align: right;
+    justify-self: end;
+  }
 }
 
 .scroll-hint {
