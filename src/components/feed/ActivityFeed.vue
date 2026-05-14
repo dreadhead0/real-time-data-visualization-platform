@@ -9,6 +9,10 @@ const store = useAlertsStore();
 const autoScroll = ref(true);
 const listEl = ref<HTMLDivElement | null>(null);
 const tableScrollEl = ref<HTMLDivElement | null>(null);
+
+let touchStartX = 0;
+let touchStartY = 0;
+let touchStartScrollLeft = 0;
 const INITIAL_VISIBLE_EVENTS = 40;
 const LOAD_STEP = 40;
 const BOTTOM_THRESHOLD_PX = 80;
@@ -95,6 +99,34 @@ function onTableWheel(event: WheelEvent) {
   tableScrollEl.value.scrollLeft += horizontalDelta;
   event.preventDefault();
 }
+
+function onTableTouchStart(event: TouchEvent) {
+  if (!tableScrollEl.value) return;
+
+  const touch = event.touches[0];
+  if (!touch) return;
+
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  touchStartScrollLeft = tableScrollEl.value.scrollLeft;
+}
+
+function onTableTouchMove(event: TouchEvent) {
+  if (!tableScrollEl.value) return;
+
+  const touch = event.touches[0];
+  if (!touch) return;
+
+  const deltaX = touch.clientX - touchStartX;
+  const deltaY = touch.clientY - touchStartY;
+
+  const isHorizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY);
+
+  if (!isHorizontalSwipe) return;
+
+  tableScrollEl.value.scrollLeft = touchStartScrollLeft - deltaX;
+  event.preventDefault();
+}
 </script>
 
 <template>
@@ -153,6 +185,8 @@ function onTableWheel(event: WheelEvent) {
   ref="tableScrollEl"
   class="feed-table-scroll"
   @wheel="onTableWheel"
+  @touchstart="onTableTouchStart"
+  @touchmove="onTableTouchMove"
 >
       <div class="feed-table-inner">
         <div class="feed-table-head">
