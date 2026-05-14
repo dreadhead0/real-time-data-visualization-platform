@@ -14,12 +14,15 @@ import {
   Database,
   FileText,
   Globe2,
+  LoaderCircle,
   MemoryStick,
   Network,
+  Pause,
   RadioTower,
   ShieldAlert,
   SlidersHorizontal,
   TrendingUp,
+  WifiOff,
   XCircle,
   Zap,
 } from "lucide-vue-next";
@@ -30,21 +33,51 @@ import { useAnalyticsStore } from "@/stores/analytics";
 import { useStreamConnection } from "@/composables/useStreamConnection";
 import { useAnalyticsStream } from "@/composables/useAnalyticsStream";
 
-const HeatmapChart = defineAsyncComponent(
-  () => import("@/components/charts/HeatmapChart.vue"),
-);
-const CandlestickChart = defineAsyncComponent(
-  () => import("@/components/charts/CandlestickChart.vue"),
-);
-const RadarHealthChart = defineAsyncComponent(
-  () => import("@/components/charts/RadarHealthChart.vue"),
-);
-const NetworkGraphChart = defineAsyncComponent(
-  () => import("@/components/charts/NetworkGraphChart.vue"),
-);
-const GeoTrafficMap = defineAsyncComponent(
-  () => import("@/components/charts/GeoTrafficMap.vue"),
-);
+import { useStreamStore } from "@/stores/stream";
+import { streamManager } from "@/lib/StreamManager";
+
+import ChartLoading from "@/components/ui/ChartLoading.vue";
+import ChartLoadError from "@/components/ui/ChartLoadError.vue";
+
+const HeatmapChart = defineAsyncComponent({
+  loader: () => import("@/components/charts/HeatmapChart.vue"),
+  loadingComponent: ChartLoading,
+  errorComponent: ChartLoadError,
+  delay: 120,
+  timeout: 10_000,
+});
+
+const CandlestickChart = defineAsyncComponent({
+  loader: () => import("@/components/charts/CandlestickChart.vue"),
+  loadingComponent: ChartLoading,
+  errorComponent: ChartLoadError,
+  delay: 120,
+  timeout: 10_000,
+});
+
+const RadarHealthChart = defineAsyncComponent({
+  loader: () => import("@/components/charts/RadarHealthChart.vue"),
+  loadingComponent: ChartLoading,
+  errorComponent: ChartLoadError,
+  delay: 120,
+  timeout: 10_000,
+});
+
+const NetworkGraphChart = defineAsyncComponent({
+  loader: () => import("@/components/charts/NetworkGraphChart.vue"),
+  loadingComponent: ChartLoading,
+  errorComponent: ChartLoadError,
+  delay: 120,
+  timeout: 10_000,
+});
+
+const GeoTrafficMap = defineAsyncComponent({
+  loader: () => import("@/components/charts/GeoTrafficMap.vue"),
+  loadingComponent: ChartLoading,
+  errorComponent: ChartLoadError,
+  delay: 120,
+  timeout: 10_000,
+});
 
 import AdvancedDashboardControls from "@/components/controls/AdvancedDashboardControls.vue";
 import SecurityEventsTable from "@/components/tables/SecurityEventsTable.vue";
@@ -66,6 +99,43 @@ useAnalyticsStream();
 const metrics = useMetricsStore();
 const alerts = useAlertsStore();
 const analytics = useAnalyticsStore();
+
+const stream = useStreamStore();
+
+const connectionNotice = computed(() => {
+  if (stream.paused) {
+    return {
+      level: "paused",
+      icon: Pause,
+      title: "Stream paused",
+      message: "Live updates are paused. Resume streaming to continue receiving data.",
+    };
+  }
+
+  if (stream.status === "connecting") {
+    return {
+      level: "connecting",
+      icon: LoaderCircle,
+      title: "Connecting stream",
+      message: "Attempting to establish the live data stream.",
+    };
+  }
+
+  if (stream.status === "disconnected" || stream.status === "error") {
+    return {
+      level: "error",
+      icon: WifiOff,
+      title: "Stream disconnected",
+      message: "The dashboard is not receiving live data. Retry the connection.",
+    };
+  }
+
+  return null;
+});
+
+function retryStreamConnection() {
+  streamManager.connect();
+}
 
 const isInfrastructureMode = computed(() => {
   return (
@@ -322,6 +392,33 @@ const healthCards = computed<
         </div>
       </div>
     </div>
+
+    <Transition name="banner">
+  <div
+    v-if="connectionNotice"
+    class="connection-banner"
+    :class="`connection-${connectionNotice.level}`"
+  >
+    <component
+      :is="connectionNotice.icon"
+      :size="18"
+      :class="{ spinning: connectionNotice.level === 'connecting' }"
+    />
+
+    <div>
+      <strong>{{ connectionNotice.title }}</strong>
+      <span>{{ connectionNotice.message }}</span>
+    </div>
+
+    <button
+      v-if="connectionNotice.level === 'error'"
+      type="button"
+      @click="retryStreamConnection"
+    >
+      Retry
+    </button>
+  </div>
+</Transition>
 
     <Transition name="banner">
       <div
@@ -778,6 +875,72 @@ const healthCards = computed<
   animation: pulse-dot 1.5s ease-in-out infinite;
 }
 
+.connection-banner {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.connection-banner div {
+  flex: 1;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.connection-banner strong {
+  color: var(--text-primary);
+  font-size: 0.82rem;
+}
+
+.connection-banner span {
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+}
+
+.connection-banner button {
+  min-height: 2rem;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  background: rgba(56, 189, 248, 0.09);
+  color: var(--neon-blue);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.connection-paused {
+  border-color: rgba(251, 191, 36, 0.24);
+  background: rgba(251, 191, 36, 0.075);
+}
+
+.connection-connecting {
+  border-color: rgba(56, 189, 248, 0.24);
+  background: rgba(56, 189, 248, 0.075);
+}
+
+.connection-error {
+  border-color: rgba(244, 63, 94, 0.24);
+  background: rgba(244, 63, 94, 0.075);
+}
+
+.spinning {
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .alert-banner {
   position: relative;
   z-index: 2;
@@ -1066,36 +1229,38 @@ const healthCards = computed<
 
 .process-monitor-full {
   min-height: 430px;
+  min-width: 0;
+  overflow-anchor: none;
 }
 
 .activity-log-full {
+  height: 560px;
   min-height: 560px;
+  max-height: 560px;
+  min-width: 0;
+  overflow: hidden;
+  overflow-anchor: none;
+  contain: layout paint;
 }
 
 .activity-log-full :deep(.feed-wrapper) {
-  min-height: 560px;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+}
+
+@media (max-width: 680px) {
+  .activity-log-full {
+    height: 520px;
+    min-height: 520px;
+    max-height: 520px;
+  }
 }
 
 @media (max-width: 1180px) {
   .log-load-grid {
     grid-template-columns: 1fr;
   }
-
-  .activity-log-full {
-    min-height: 460px;
-  }
-
-  .activity-log-full :deep(.feed-wrapper) {
-    min-height: 460px;
-  }
-}
-
-.activity-log-full {
-  min-height: 520px;
-}
-
-.activity-log-full :deep(.feed-wrapper) {
-  min-height: 520px;
 }
 
 .bottom-left,
@@ -1143,14 +1308,6 @@ const healthCards = computed<
 
   .inspector-grid {
     grid-template-columns: 1fr;
-  }
-
-  .activity-log-full {
-    min-height: 460px;
-  }
-
-  .activity-log-full :deep(.feed-wrapper) {
-    min-height: 460px;
   }
 }
 
@@ -1281,6 +1438,23 @@ const healthCards = computed<
   .controls-toggle {
     width: 100%;
     justify-content: space-between;
+  }
+}
+
+@media (max-width: 680px) {
+  .chart-card {
+    overflow: hidden;
+  }
+
+  .charts-grid .chart-card {
+    min-height: 340px;
+  }
+}
+
+@media (max-width: 680px) {
+  .charts-grid .chart-card {
+    min-height: 340px;
+    overflow: hidden;
   }
 }
 </style>

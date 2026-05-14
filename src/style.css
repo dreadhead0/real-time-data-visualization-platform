@@ -2234,3 +2234,13 @@ html[data-theme='light'] .preview-metrics span {
   outline: 2px solid rgba(56, 189, 248, 0.35);
   outline-offset: 2px;
 }
+
+.dashboard,
+.dashboard-body,
+.process-monitor-full,
+.activity-log-full,
+.feed-wrapper,
+.feed-table-scroll,
+.feed-list {
+  overflow-anchor: none;
+}

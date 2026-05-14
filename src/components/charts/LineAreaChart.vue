@@ -26,6 +26,10 @@ function getColor() {
   return props.color ?? "#38bdf8";
 }
 
+function isCompactChart() {
+  return (el.value?.clientWidth ?? window.innerWidth) < 520;
+}
+
 function buildOption() {
   const color = getColor();
 
@@ -37,13 +41,13 @@ function buildOption() {
       fontFamily: "'JetBrains Mono', monospace",
     },
     grid: {
-      left: 44,
-      right: 14,
+      left: isCompactChart() ? 34 : 44,
+      right: isCompactChart() ? 10 : 14,
       top: 12,
-      bottom: 30,
-      containLabel: false,
+      bottom: isCompactChart() ? 36 : 30,
+      containLabel: true,
     },
-    tooltip: {
+    ltip: {
       trigger: "axis",
       appendToBody: true,
       backgroundColor: "rgba(9,13,26,0.96)",
@@ -78,6 +82,8 @@ function buildOption() {
     xAxis: {
       type: "time",
       boundaryGap: false,
+      minInterval: isCompactChart() ? 30_000 : 10_000,
+      maxInterval: isCompactChart() ? 120_000 : undefined,
       axisLine: {
         lineStyle: { color: "rgba(148, 163, 184, 0.12)" },
       },
@@ -95,9 +101,27 @@ function buildOption() {
       max: props.unit === "%" ? 100 : undefined,
       axisLabel: {
         color: "#4b5f78",
-        fontSize: 10,
+        fontSize: isCompactChart() ? 8 : 10,
         fontFamily: "'JetBrains Mono', monospace",
-        formatter: (value: number) => `${value}${props.unit ?? ""}`,
+        hideOverlap: true,
+        showMinLabel: true,
+        showMaxLabel: true,
+        formatter: (value: number) => {
+          const date = new Date(value);
+
+          if (isCompactChart()) {
+            return date.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+          }
+
+          return date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          });
+        },
       },
       splitLine: {
         lineStyle: {

@@ -118,14 +118,17 @@ export const usePreferencesStore = defineStore(
       patchCurrentPreferences({ avatarDataUrl: '' })
     }
 
-    function resetProfile(): void {
-      patchCurrentPreferences({
-        displayName: 'Operations Analyst',
-        role: 'Real-time Systems Monitor',
-        avatarDataUrl: '',
-      })
-    }
+function resetProfile(): void {
+  const currentEmail = currentPreferences.value.email
+  const currentName = currentPreferences.value.displayName
 
+  patchCurrentPreferences({
+    displayName: currentName,
+    email: currentEmail,
+    role: 'Real-time Systems Monitor',
+    avatarDataUrl: '',
+  })
+}
 
     return {
       activeEmail,

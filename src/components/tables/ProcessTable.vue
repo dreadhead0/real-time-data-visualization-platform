@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
+import { Search, TriangleAlert } from "lucide-vue-next";
 import type { ProcessRow } from "@/types/dashboard";
 
 const NAMES = [
@@ -59,8 +60,9 @@ function makeProcess(pid: number): ProcessRow & { id: string } {
 
 const processes = ref<(ProcessRow & { id: string })[]>([]);
 const searchQuery = ref("");
-const sortKey = ref<"cpu" | "memory" | "pid">("cpu");
-const sortDir = ref<"asc" | "desc">("desc");
+const sortKey = ref<"cpu" | "memory" | "pid">("pid");
+const sortDir = ref<"asc" | "desc">("asc");
+const userHasSorted = ref(false);
 const confirmKill = ref<(ProcessRow & { id: string }) | null>(null);
 const toast = ref<{ msg: string; type: string } | null>(null);
 let toastTimer = 0;
@@ -102,16 +104,24 @@ const filtered = computed(() => {
     });
   }
 
-  return [...list].sort((a, b) => {
+  const sorted = [...list];
+
+  if (!userHasSorted.value) {
+    return sorted.sort((a, b) => a.pid - b.pid);
+  }
+
+  return sorted.sort((a, b) => {
     const mul = sortDir.value === "desc" ? -1 : 1;
     return (a[sortKey.value] - b[sortKey.value]) * mul;
   });
 });
 
 function toggleSort(key: typeof sortKey.value) {
-  if (sortKey.value === key)
+  userHasSorted.value = true;
+
+  if (sortKey.value === key) {
     sortDir.value = sortDir.value === "desc" ? "asc" : "desc";
-  else {
+  } else {
     sortKey.value = key;
     sortDir.value = "desc";
   }
@@ -173,7 +183,9 @@ const statusColor: Record<string, string> = {
         <span class="proc-count">{{ filtered.length }} processes</span>
       </div>
       <div class="search-wrap">
-        <span class="search-icon">⌕</span>
+        <span class="search-icon">
+  <Search :size="14" />
+</span>
         <input
           id="process-search"
           name="processSearch"
@@ -185,104 +197,107 @@ const statusColor: Record<string, string> = {
       </div>
     </div>
 
-    <!-- Column heads -->
-    <div class="col-heads">
-      <span class="col-pid">PID</span>
-      <span class="col-name">NAME</span>
-      <span class="col-status">STATUS</span>
-      <span class="col-sort" @click="toggleSort('cpu')">
-        CPU%
-        <span class="sort-arrow">{{
-          sortKey === "cpu" ? (sortDir === "desc" ? "↓" : "↑") : "↕"
-        }}</span>
-      </span>
-      <span class="col-sort" @click="toggleSort('memory')">
-        MEM%
-        <span class="sort-arrow">{{
-          sortKey === "memory" ? (sortDir === "desc" ? "↓" : "↑") : "↕"
-        }}</span>
-      </span>
-      <span class="col-thr">THR</span>
-      <span class="col-user">USER</span>
-      <span class="col-pri">PRI</span>
-      <span class="col-actions">ACTIONS</span>
-    </div>
-
-    <!-- Rows -->
-    <div class="proc-list">
-      <div
-        v-for="p in filtered"
-        :key="p.id"
-        class="proc-row"
-        :class="`row-${p.status}`"
-      >
-        <span class="col-pid mono">{{ p.pid }}</span>
-        <span class="col-name mono">{{ p.name }}</span>
-        <span class="col-status">
-          <span
-            class="status-badge"
-            :style="`color: ${statusColor[p.status] ?? '#7d8fa8'}; border-color: ${statusColor[p.status] ?? '#3d4f65'}40`"
-          >
-            <span
-              class="status-dot"
-              :style="`background:${statusColor[p.status] ?? '#3d4f65'}`"
-            />
-            {{ p.status }}
+    <div class="process-table-scroll">
+      <div class="process-table-inner">
+        <div class="col-heads">
+          <span class="col-pid">PID</span>
+          <span class="col-name">NAME</span>
+          <span class="col-status">STATUS</span>
+          <span class="col-sort" @click="toggleSort('cpu')">
+            CPU%
+            <span class="sort-arrow">{{
+              sortKey === "cpu" ? (sortDir === "desc" ? "↓" : "↑") : "↕"
+            }}</span>
           </span>
-        </span>
-        <span class="col-metric">
-          <span class="metric-bar-wrap">
-            <span
-              class="metric-bar-fill"
-              :style="`width:${p.cpu}%; background: ${p.cpu > 80 ? 'var(--neon-red)' : p.cpu > 50 ? 'var(--neon-amber)' : 'var(--neon-blue)'}`"
-            />
+          <span class="col-sort" @click="toggleSort('memory')">
+            MEM%
+            <span class="sort-arrow">{{
+              sortKey === "memory" ? (sortDir === "desc" ? "↓" : "↑") : "↕"
+            }}</span>
           </span>
-          <span class="mono metric-val">{{ p.cpu.toFixed(1) }}</span>
-        </span>
-        <span class="col-metric">
-          <span class="metric-bar-wrap">
+          <span class="col-thr">THR</span>
+          <span class="col-user">USER</span>
+          <span class="col-pri">PRI</span>
+          <span class="col-actions">ACTIONS</span>
+        </div>
+
+        <!-- Rows -->
+        <div class="proc-list">
+          <div
+            v-for="p in filtered"
+            :key="p.id"
+            class="proc-row"
+            :class="`row-${p.status}`"
+          >
+            <span class="col-pid mono">{{ p.pid }}</span>
+            <span class="col-name mono">{{ p.name }}</span>
+            <span class="col-status">
+              <span
+                class="status-badge"
+                :style="`color: ${statusColor[p.status] ?? '#7d8fa8'}; border-color: ${statusColor[p.status] ?? '#3d4f65'}40`"
+              >
+                <span
+                  class="status-dot"
+                  :style="`background:${statusColor[p.status] ?? '#3d4f65'}`"
+                />
+                {{ p.status }}
+              </span>
+            </span>
+            <span class="col-metric">
+              <span class="metric-bar-wrap">
+                <span
+                  class="metric-bar-fill"
+                  :style="`width:${p.cpu}%; background: ${p.cpu > 80 ? 'var(--neon-red)' : p.cpu > 50 ? 'var(--neon-amber)' : 'var(--neon-blue)'}`"
+                />
+              </span>
+              <span class="mono metric-val">{{ p.cpu.toFixed(1) }}</span>
+            </span>
+            <span class="col-metric">
+              <span class="metric-bar-wrap">
+                <span
+                  class="metric-bar-fill"
+                  :style="`width:${p.memory}%; background: ${p.memory > 80 ? 'var(--neon-red)' : 'var(--neon-purple)'}`"
+                />
+              </span>
+              <span class="mono metric-val">{{ p.memory.toFixed(1) }}</span>
+            </span>
+            <span class="col-thr mono">{{ p.threads }}</span>
+            <span class="col-user mono">{{ p.user }}</span>
             <span
-              class="metric-bar-fill"
-              :style="`width:${p.memory}%; background: ${p.memory > 80 ? 'var(--neon-red)' : 'var(--neon-purple)'}`"
-            />
-          </span>
-          <span class="mono metric-val">{{ p.memory.toFixed(1) }}</span>
-        </span>
-        <span class="col-thr mono">{{ p.threads }}</span>
-        <span class="col-user mono">{{ p.user }}</span>
-        <span
-          class="col-pri mono"
-          :style="`color:${p.priority < 0 ? 'var(--neon-amber)' : 'var(--text-dim)'}`"
-          >{{ p.priority }}</span
-        >
-        <span class="col-actions">
-          <button
-            class="act-btn act-kill"
-            type="button"
-            @click="killProcess(p)"
-            title="Kill process"
-          >
-            Kill
-          </button>
+              class="col-pri mono"
+              :style="`color:${p.priority < 0 ? 'var(--neon-amber)' : 'var(--text-dim)'}`"
+              >{{ p.priority }}</span
+            >
+            <span class="col-actions">
+              <button
+                class="act-btn act-kill"
+                type="button"
+                @click="killProcess(p)"
+                title="Kill process"
+              >
+                Kill
+              </button>
 
-          <button
-            class="act-btn act-nice"
-            type="button"
-            @click="niceProcess(p)"
-            title="Nice process"
-          >
-            Nice
-          </button>
+              <button
+                class="act-btn act-nice"
+                type="button"
+                @click="niceProcess(p)"
+                title="Nice process"
+              >
+                Nice
+              </button>
 
-          <button
-            class="act-btn act-info"
-            type="button"
-            @click="infoProcess(p)"
-            title="Process info"
-          >
-            Info
-          </button>
-        </span>
+              <button
+                class="act-btn act-info"
+                type="button"
+                @click="infoProcess(p)"
+                title="Process info"
+              >
+                Info
+              </button>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -294,7 +309,9 @@ const statusColor: Record<string, string> = {
         @click.self="confirmKill = null"
       >
         <div class="modal-box">
-          <div class="modal-icon">⚠</div>
+          <div class="modal-icon">
+  <TriangleAlert :size="34" />
+</div>
           <h3 class="modal-title">Kill Process?</h3>
           <p class="modal-msg">
             This will terminate <strong>{{ confirmKill.name }}</strong>
@@ -626,9 +643,10 @@ const statusColor: Record<string, string> = {
   animation: slide-up 0.2s ease;
 }
 .modal-icon {
-  font-size: 32px;
   color: var(--neon-amber);
   margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
 }
 .modal-title {
   font-size: 18px;
@@ -786,5 +804,123 @@ const statusColor: Record<string, string> = {
 .action-info:hover {
   background: rgba(56, 189, 248, 0.18);
   border-color: rgba(56, 189, 248, 0.4);
+}
+
+/* FINAL CLEAN PROCESS MONITOR TABLE */
+.process-table-scroll {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.process-table-inner {
+  --process-cols:
+    60px minmax(105px, 1fr) 112px minmax(120px, 0.85fr)
+    minmax(120px, 0.85fr) 46px 92px 48px 142px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+.col-heads,
+.proc-row {
+  display: grid;
+  grid-template-columns: var(--process-cols) !important;
+  column-gap: 0.55rem !important;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+}
+
+.proc-list {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 380px;
+}
+
+.col-pid,
+.col-name,
+.col-status,
+.col-metric,
+.col-thr,
+.col-user,
+.col-pri,
+.col-actions {
+  min-width: 0;
+}
+
+.col-name,
+.col-user {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.col-status {
+  overflow: hidden;
+}
+
+.status-badge {
+  max-width: 104px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.col-metric {
+  grid-template-columns: minmax(70px, 1fr) 42px;
+  gap: 0.45rem;
+}
+
+.metric-val {
+  min-width: 42px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.col-actions {
+  justify-content: flex-start;
+  gap: 0.25rem;
+}
+
+.act-btn {
+  min-width: 36px;
+  padding: 0 0.42rem;
+}
+
+/* Mobile/tablet keeps horizontal scroll. Desktop does not. */
+@media (max-width: 900px) {
+  .process-table-scroll {
+    overflow-x: auto;
+  }
+
+  .process-table-inner {
+    --process-cols:
+      72px 150px 128px 170px
+      170px 64px 130px 64px 148px;
+
+    width: max-content;
+    min-width: 1250px;
+  }
+
+  .col-heads,
+  .proc-row {
+    width: max-content;
+    min-width: 100%;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .table-header {
+    align-items: stretch;
+  }
+
+  .search-wrap,
+  .proc-search {
+    width: 100%;
+  }
 }
 </style>

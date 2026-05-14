@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import * as echarts from "echarts/core";
+
+import { escapeHtml, safeTooltipNumber } from "@/utils/sanitize";
 import { HeatmapChart } from "echarts/charts";
 import {
   GridComponent,
@@ -67,7 +69,7 @@ function renderChart() {
       textStyle: { color: "#e5edf8" },
       formatter(params: any) {
         const [x, y, value] = params.value;
-        return `${buckets[y]}<br/>${timeBuckets[x]} · ${value}% intensity`;
+        return `${escapeHtml(buckets[y])}<br/>${escapeHtml(timeBuckets[x])} · ${safeTooltipNumber(value)}% intensity`;
       },
     },
     grid: {

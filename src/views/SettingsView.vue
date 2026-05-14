@@ -84,11 +84,12 @@ function saveProfile() {
 
 function resetProfile() {
   preferences.resetProfile();
+
   nameDraft.value = preferences.displayName;
   roleDraft.value = preferences.role;
   emailDraft.value = preferences.email;
 
-  toast.info("Profile reset to defaults.");
+  toast.info("Profile reset for this account.");
 }
 
 function openFilePicker() {
