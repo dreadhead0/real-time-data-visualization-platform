@@ -8,7 +8,7 @@ onErrorCaptured((err, _instance, errorInfo) => {
   error.value = err instanceof Error ? err : new Error(String(err))
   info.value  = errorInfo
   console.error('[ErrorBoundary]', err, errorInfo)
-  return false // prevent further propagation
+  return false 
 })
 
 function reset() {

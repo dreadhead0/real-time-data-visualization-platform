@@ -329,7 +329,6 @@ const statusColor: Record<string, string> = {
       </div>
     </Teleport>
 
-    <!-- Toast -->
     <Teleport to="body">
       <div v-if="toast" class="toast" :class="`toast-${toast.type}`">
         <span class="toast-dot" />
@@ -617,7 +616,6 @@ const statusColor: Record<string, string> = {
   box-shadow: 0 0 18px rgba(56, 189, 248, 0.14);
 }
 
-/* Modal */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -696,7 +694,6 @@ const statusColor: Record<string, string> = {
   background: rgba(244, 63, 94, 0.25);
 }
 
-/* Toast */
 .toast {
   position: fixed;
   bottom: 28px;
@@ -806,7 +803,6 @@ const statusColor: Record<string, string> = {
   border-color: rgba(56, 189, 248, 0.4);
 }
 
-/* FINAL CLEAN PROCESS MONITOR TABLE */
 .process-table-scroll {
   width: 100%;
   min-width: 0;
@@ -891,7 +887,6 @@ const statusColor: Record<string, string> = {
   padding: 0 0.42rem;
 }
 
-/* Mobile/tablet keeps horizontal scroll. Desktop does not. */
 @media (max-width: 900px) {
   .process-table-scroll {
     overflow-x: auto;

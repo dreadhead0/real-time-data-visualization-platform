@@ -134,5 +134,4 @@ export class StreamManager {
   }
 }
 
-// Singleton instance — import and use across the app
 export const streamManager = new StreamManager('mock')

@@ -1240,7 +1240,6 @@ html[data-theme='light'] .input-with-icon:focus-within {
   }
 }
 
-/* Dashboard hero compact polish */
 @media (max-width: 1180px) {
   .dashboard-hero {
     padding: 1rem;
@@ -1285,7 +1284,6 @@ html[data-theme='light'] .input-with-icon:focus-within {
   }
 }
 
-/* Landing page final polish */
 .landing-page {
   display: block;
   overflow-x: hidden;
@@ -1374,7 +1372,6 @@ html[data-theme='light'] .input-with-icon:focus-within {
   }
 }
 
-/* Final mobile/tablet theme toggle centering fix */
 @media (max-width: 920px) {
   .topbar__actions .theme-toggle {
     width: 42px;
@@ -1449,7 +1446,6 @@ body,
   overflow-x: hidden;
 }
 
-/* Landing page richness polish */
 .landing-page {
   position: relative;
   isolation: isolate;
@@ -1619,7 +1615,6 @@ body,
   }
 }
 
-/* Final landing layout correction */
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(390px, 0.85fr);
@@ -1675,7 +1670,6 @@ body,
   }
 }
 
-/* Final landing layout correction */
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(390px, 0.85fr);
@@ -1958,7 +1952,6 @@ html[data-theme='light'] .toast-card {
   }
 }
 
-/* Logout danger interaction */
 .sidebar__logout {
   color: var(--text-secondary);
   transition:
@@ -1989,7 +1982,6 @@ html[data-theme='light'] .toast-card {
   color: var(--neon-red);
 }
 
-/* Remove native focus/outline border from auth submit buttons */
 .auth-form .primary-button,
 .auth-form .full-button {
   border: 0 !important;
@@ -2008,7 +2000,6 @@ html[data-theme='light'] .toast-card {
     0 0 0 3px rgba(56, 189, 248, 0.18);
 }
 
-/* Landing stat pills light mode */
 html[data-theme='light'] .hero-stats div {
   background: rgba(255, 255, 255, 0.82);
   border-color: rgba(15, 23, 42, 0.12);
@@ -2039,7 +2030,6 @@ html[data-theme='light'] .preview-metrics span {
   box-shadow: none !important;
 }
 
-/* Stable sidebar layout with logout pinned at bottom */
 .sidebar {
   height: 100dvh;
   min-height: 100dvh;
@@ -2074,7 +2064,6 @@ html[data-theme='light'] .preview-metrics span {
   }
 }
 
-/* Final app shell layout fix: sidebar column + scrollable workspace */
 @media (min-width: 921px) {
   .app-shell {
     --sidebar-width: 14rem;
@@ -2210,7 +2199,6 @@ html[data-theme='light'] .preview-metrics span {
   min-height: 220px;
 }
 
-/* Remove heavy blue glow under primary buttons */
 .primary-button,
 .full-button,
 .auth-form .primary-button,

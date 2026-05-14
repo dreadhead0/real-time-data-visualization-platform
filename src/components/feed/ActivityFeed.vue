@@ -443,7 +443,6 @@ function onTableTouchMove(event: TouchEvent) {
   border-color: rgba(244, 63, 94, 0.2);
 }
 
-/* Desktop: no horizontal scroll, table fills card */
 .feed-table-scroll {
   flex: 1 1 auto;
   min-height: 0;
@@ -711,7 +710,6 @@ function onTableTouchMove(event: TouchEvent) {
   background: rgba(56, 189, 248, 0.06);
 }
 
-/* Mobile/tablet: horizontal table scroll only here */
 @media (max-width: 900px) {
 .feed-table-scroll {
   --mobile-feed-width: 920px;
@@ -726,7 +724,6 @@ function onTableTouchMove(event: TouchEvent) {
   touch-action: pan-x pan-y;
   overscroll-behavior-x: contain;
 
-  /* hide visible horizontal scrollbar, keep scroll working */
   scrollbar-width: none;
 }
 

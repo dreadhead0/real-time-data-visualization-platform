@@ -78,21 +78,19 @@ export class MockGenerator {
   private metricIndex = 0
 
   start(onPayload: (p: StreamPayload) => void): void {
-    // Emit one metric at a time, cycling through all metrics
+    
     const metricTimer = setInterval(() => {
       const metric = METRIC_NAMES[this.metricIndex % METRIC_NAMES.length]
       this.metricIndex++
       const point = generateMetricPoint(metric)
       onPayload({ type: 'metric', data: point, ts: Date.now() })
 
-      // Occasionally emit an alert when value is near threshold
       const threshold = THRESHOLDS[metric]
       if (point.value > threshold * 0.9 && Math.random() < 0.3) {
         onPayload({ type: 'alert', data: generateAlert(metric, point.value), ts: Date.now() })
       }
     }, 200)
 
-    // Heartbeat every 5s
     const heartbeatTimer = setInterval(() => {
       onPayload({ type: 'heartbeat', data: null, ts: Date.now() })
     }, 5000)

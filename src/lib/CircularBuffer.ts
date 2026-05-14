@@ -1,7 +1,3 @@
-/**
- * Fixed-capacity circular buffer. Oldest items are evicted when full.
- * Avoids O(n) shift() on every push.
- */
 export class CircularBuffer<T> {
   private buf: (T | undefined)[]
   private head = 0
@@ -23,7 +19,6 @@ export class CircularBuffer<T> {
     return this._size
   }
 
-  /** Returns items oldest-first as a plain array. */
   toArray(): T[] {
     if (this._size === 0) return []
     if (this._size < this.capacity) {
@@ -34,7 +29,6 @@ export class CircularBuffer<T> {
     return [...tail, ...front]
   }
 
-  /** Returns only items with timestamp >= since (assumes T has a timestamp field). */
   since(sinceMs: number): T[] {
     return this.toArray().filter(
       (item) => (item as unknown as { timestamp: number }).timestamp >= sinceMs,

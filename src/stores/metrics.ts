@@ -38,7 +38,6 @@ export const useMetricsStore = defineStore('metrics', () => {
   const latestValues = ref<Partial<DashboardSummary>>({})
   const timeRange = ref<TimeRange>('5m')
 
-  // This makes chart series reactive even though CircularBuffer itself is not.
   const seriesVersion = ref(0)
 
   function pushPoint(point: MetricPoint): void {
